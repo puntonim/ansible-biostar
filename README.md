@@ -1,6 +1,6 @@
 # Ansible deployment for Biostar-based projects
 
-## Overview
+## 1. Overview
 An Ansible playbook to automatize the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 instance.
 
 The tasks performed by the playbook are:
@@ -12,7 +12,7 @@ The tasks performed by the playbook are:
 - Build and run a Docker container with PostgreSQL 9.3.
 - Build and run a Docker container with [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
 
-## Requirements
+## 2. Requirements
 You need Ansible to be installed in the local machine.
 The best way to install it is to start a Python 2.7 virtual environment and then:
 ```
@@ -21,7 +21,7 @@ pip install ansible
 
 *Note*: during the deployment `boto` will be installed in the local machine (in the virtual environment in this case).
 
-## Usage
+## 3. Usage
 The basic usage is:
 ```
 ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
@@ -30,7 +30,9 @@ ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=Y
 Ansible will output the IP address of the launched EC2 instance.
 When the playbook is completed, you can then visit your new website at that address (on port 80).
 
-### Arguments
+On a t1.micro instance it takes about 20 mins.
+
+### 3.1. Arguments
 The are 2 groups of arguments.
 
 **Amazon AWS**: arguments to define the new EC2 instance that will be launched.
@@ -57,16 +59,16 @@ Example:
 ansible-playbook site.yml --extra-vars "aws_access_key=HKJHJK aws_secret_key=ghjGHJgjHGJ volume_size=8 postgresql_username=superman postgresql_password=fgHGFHGhgfh git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment"
 ```
 
-## SSH connections
+## 4. SSH Connections
 You can SSH into the EC2 instance and into the 2 Docker containers.
 
-### SSH into the EC2 instance
+### 4.1. SSH Into The EC2 Instance
 ```
 ssh ubuntu@<INSTANCE_IP>
 ```
 Ansible will output the instance IP.
 
-### SSH into the Docker containers
+### 4.2. SSH Into The Docker Containers
 First SSH to the EC2 instance.  
 Then you can either SSH into the webapp container:  
 ```
@@ -75,4 +77,14 @@ ssh root@127.0.0.1 -p 2222
 Or SSH into the PostgreSQL container:  
 ```
 ssh root@127.0.0.1 -p 2223
+```
+
+## 5. Code Updates
+- SSH into the webapp Docker container
+- Update the code (or do any other change)
+- Run `exit` to close the SSH connection to the Docker container
+- Now you should be connected via SSH to the EC2 instance, run:
+```
+docker stop webapp
+docker start webapp
 ```
