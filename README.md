@@ -1,7 +1,7 @@
 # Ansible deployment for Biostar-based projects
 
 ## 1. Overview
-An Ansible playbook to automatize the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 instance.
+An Ansible playbook to automatize the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 instance using Docker containers.
 
 The tasks performed by the playbook are:
 
