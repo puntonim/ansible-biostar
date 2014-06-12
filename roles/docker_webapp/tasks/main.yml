@@ -1,0 +1,39 @@
+---
+- name: Gathering ec2_facts 
+  ec2_facts:
+
+- name: Ensure Docker server is running
+  service:
+    name=docker
+    state=started
+
+- name: Create dir for Dockerfile
+  file:
+    path=/tmp/docker/webapp/
+    state=directory
+
+- name: Copy the Dockerfile
+  template:
+    src=Dockerfile.j2
+    dest=/tmp/docker/webapp/Dockerfile
+
+- name: Copy run.sh
+  copy:
+    src=run.sh
+    dest=/tmp/docker/webapp/run.sh
+
+- name: Build the webapp container
+  command:
+    docker build -t neurostars/webapp .
+    chdir=/tmp/docker/webapp/
+
+- name: Run the webapp container
+  docker:
+    image=neurostars/webapp
+    name=webapp
+    ports=2222:22,80:8000
+    env="BIOSTAR_HOME=/root/biostar"
+    links=postgresql:pg
+
+- name: Delete the Dockerfile
+  command: rm /tmp/docker/webapp/Dockerfile

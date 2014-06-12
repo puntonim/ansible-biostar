@@ -1,0 +1,42 @@
+# TODO: This is an old version. It needs to be edited in order to work with the new Ansible playbook.
+---
+- name: "Create GCE instance"
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+   - name: "Convert the GCE .p12 file to .pem RSA key"
+     local_action: shell openssl pkcs12 -in templates/gce-private-notasecret.p12 -passin pass:notasecret -nodes -nocerts | openssl rsa -out templates/pkey.pem
+
+   - name: "Download CA keychain for apache-libcloud"
+     local_action: command wget https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt -O templates/ca-bundle.crt
+
+   - name: "Launch instances"
+     environment:
+        SSL_CERT_FILE: templates/ca-bundle.crt
+     gce:
+         instance_names: biostar
+         machine_type: n1-standard-1
+         image: debian-7
+         service_account_email: "{{ gce_dev_id }}"
+         pem_file: templates/pkey.pem
+         project_id: "{{ gce_prj_id }}"
+     register: gce
+
+   - name: "Wait for SSH to come up"
+     wait_for: host={{ item.public_ip }} port=22 delay=10 timeout=60
+     with_items: gce.instance_data
+
+   - name: "Group newly created instances"
+     add_host: hostname={{ item.public_ip }} groupname=new_instances
+     with_items: gce.instance_data
+
+   - name: "Add host public key to GCE instance"
+     local_action: shell gcutil --service_version="v1" --project={{ gce_prj_id }} ssh --zone="us-central1-a" "biostar"
+
+- name: "Manage new instances"
+  hosts: new_instances
+  connection: ssh
+  roles:
+    - ../common

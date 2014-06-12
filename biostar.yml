@@ -1,0 +1,16 @@
+---
+- hosts: biostarhosts
+  gather_facts: False
+  user: ubuntu
+  sudo: True
+
+  # Those vars are here (instead of being in a default dir in a role) because they are shared
+  # between the docker_postgresql and the docker_webapp role.
+  vars:
+    postgresql_username: biostar
+    postgresql_password: biostar
+
+  roles:
+    - docker
+    - docker_postgresql
+    - docker_webapp

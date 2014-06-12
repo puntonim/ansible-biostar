@@ -1,0 +1,3 @@
+---
+- include: ec2.yml
+- include: biostar.yml

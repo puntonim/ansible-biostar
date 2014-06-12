@@ -1,0 +1,33 @@
+---
+- name: Ensure Docker server is running
+  service:
+    name=docker
+    state=started
+
+- name: Create dir for Dockerfile
+  file:
+    path=/tmp/docker/postgresql/
+    state=directory
+
+- name: Copy the Dockerfile
+  template:
+    src=Dockerfile.j2
+    dest=/tmp/docker/postgresql/Dockerfile
+
+- name: Copy run.sh
+  copy:
+    src=run.sh
+    dest=/tmp/docker/postgresql/run.sh
+
+- name: Build the PostgreSQL container
+  command: docker build -t neurostars/postgresql .
+    chdir=/tmp/docker/postgresql/
+
+- name: Run the PostgreSQL container
+  docker:
+    image=neurostars/postgresql
+    name=postgresql
+    ports=2223:22,5432:5432
+
+- name: Delete the Dockerfile
+  command: rm /tmp/docker/postgresql/Dockerfile

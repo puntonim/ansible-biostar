@@ -1,0 +1,83 @@
+# Use phusion/baseimage as base image. To make your builds reproducible, make
+# sure you lock down to a specific version, not to `latest`!
+# See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
+# a list of version numbers.
+FROM phusion/baseimage:latest
+
+# Set correct environment variables.
+ENV HOME /root
+
+# Regenerate SSH host keys. baseimage-docker does not contain any, so you
+# have to do that yourself. You may also comment out this instruction; the
+# init system will auto-generate one during boot.
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
+
+
+##################################################################################################
+## CUSTOMIZATION
+
+# Setup the boot script run by /sbin/my_init.
+RUN mkdir /etc/service/postgresql
+ADD run.sh /etc/service/postgresql/run
+RUN chmod +x /etc/service/postgresql/run
+
+# Install host's SSH public key.
+RUN echo "{{ host_ssh_public_key.stdout }}" >> /root/.ssh/authorized_keys
+
+# Install PostgreSQL 9.3.
+RUN apt-get update
+RUN apt-get install -y postgresql-9.3
+
+# Run the psql command as the 'postgres' user.
+USER postgres
+
+# Create a PostgreSQL role named {{ postgresql_username }} with {{ postgresql_password }} as the
+# password and then create a database {{ postgresql_username }} owned by the 
+# {{ postgresql_username }} role.
+RUN /etc/init.d/postgresql start &&\
+    psql --command "CREATE USER {{ postgresql_username }} WITH SUPERUSER PASSWORD '{{ postgresql_password }}';" &&\
+    createdb -O {{ postgresql_username }} {{ postgresql_username }} &&\
+    /etc/init.d/postgresql stop
+
+# Run the rest of the commands as root
+USER root
+
+# Adjust PostgreSQL configuration so that remote connections to the
+# database are possible.
+# Note: this is not a securoty threat because the port 5432 is 
+# firewalled in the host machine.
+RUN echo "host    all             {{ postgresql_username }}          0.0.0.0/0               md5" >> /etc/postgresql/9.3/main/pg_hba.conf
+
+# And add 'listen_addresses' to '/etc/postgresql/9.3/main/postgresql.conf'.
+RUN sed -i -r "s/#listen_addresses = 'localhost'(.*)/listen_addresses = '*'\1/" /etc/postgresql/9.3/main/postgresql.conf
+
+# Expose SSH and PostgreSQL ports.
+EXPOSE 5432 22
+
+## END CUSTOMIZATION
+##################################################################################################
+
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+###################################################################################################
+## HOW TO USE IT
+#
+# Build:
+#     docker build -t neurostars/postgresql .
+# Run:
+#     docker run -d -p 2223:22 -p 5432:5432 --name postgresql neurostars/postgresql
+# Run with an interactive shell:
+#     docker run -ti -p 2223:22 -p 5432:5432 --name postgresql neurostars/postgresql bash
+# Start:
+#     docker start postgresql
+#
+# Now you can test the connection to PostgreSQL server this way:
+#     psql -h localhost -p 5432 -U docker docker
+# If the port 5432 is exposed to a dynamic port instead, discover it with:
+# docker port postgresql 5432

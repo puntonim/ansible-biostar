@@ -1,0 +1,11 @@
+---
+aws_access_key: "..."
+aws_secret_key: "..."
+keypair: "biostar"
+instance_type: "t1.micro"
+image: "ami-896c96fe"
+group: "biostar_SG_ireland"
+region: "eu-west-1"
+volume_size: 10
+ssh_localhost_public_key_file_path: "~/.ssh/id_rsa.pub"
+ssh_localhost_public_key: "{{ lookup('file', '' + ssh_localhost_public_key_file_path) }}"

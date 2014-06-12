@@ -1,0 +1,73 @@
+# Use phusion/baseimage as base image. To make your builds reproducible, make
+# sure you lock down to a specific version, not to `latest`!
+# See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
+# a list of version numbers.
+FROM phusion/baseimage:latest
+
+# Set correct environment variables.
+ENV HOME /root
+
+# Regenerate SSH host keys. baseimage-docker does not contain any, so you
+# have to do that yourself. You may also comment out this instruction; the
+# init system will auto-generate one during boot.
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
+
+
+##################################################################################################
+## CUSTOMIZATION
+
+# Install python, pip, git, postgresql client.
+RUN apt-get update
+RUN apt-get install -y python python-pip git postgresql-client-9.3 python-psycopg2
+
+# Create a password file for PostgreSQL.
+RUN echo "*:*:*:{{ postgresql_username }}:{{ postgresql_password }}" > /root/.pgpass
+RUN chmod 0600 /root/.pgpass
+
+ENV PG_USERNAME {{ postgresql_username }}
+ENV BIOSTAR_IPS {{ ansible_ec2_public_ipv4 }},{{ ansible_ec2_public_hostname }}
+
+# Expose SSH and webserver ports.
+EXPOSE 8000 22
+
+# Create the folder /root/biostar.
+RUN mkdir /root/biostar
+RUN cd /root/biostar && git clone {{ git_https_repo }} . && git checkout {{ git_branch }}
+
+# Launch Django and run migrations when starting the container.
+ENV BIOSTAR_HOME /root/biostar
+WORKDIR /root/biostar
+
+# Ensure the directory for logs is created.
+RUN mkdir /root/biostar/live/logs
+
+# Setup the boot script run by /sbin/my_init.
+RUN mkdir /etc/service/webapp
+ADD run.sh /etc/service/webapp/run
+RUN chmod +x /etc/service/webapp/run
+
+# Install host's SSH public key.
+RUN echo "{{ host_ssh_public_key.stdout }}" >> /root/.ssh/authorized_keys
+
+## END CUSTOMIZATION
+##################################################################################################
+
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+###################################################################################################
+## HOW TO USE IT
+#
+# Build:
+#     docker build -t neurostars/webapp .
+# Run:
+#     docker run -d --link postgresql:pg -p 80:8000 --name webapp neurostars/webapp
+# Run with an interactive shell:
+#     docker run -ti --link postgresql:pg -p 80:8000 --name webapp neurostars/webapp bash
+# Start:
+#     docker start webapp
