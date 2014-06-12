@@ -54,7 +54,7 @@ The are 2 groups of arguments.
 
 Example:
 ```
-ansible-playbook site.yml --extra-vars "aws_access_key=HKJHJK aws_secret_key=ghjGHJgjHGJ volume_size=8 postgresql_username=superman postgresql_password=fgHGFHGhgfh git_https_repo=https://github.com/nimiq/biostar-central.git git_branch=new-deployment"
+ansible-playbook site.yml --extra-vars "aws_access_key=HKJHJK aws_secret_key=ghjGHJgjHGJ volume_size=8 postgresql_username=superman postgresql_password=fgHGFHGhgfh git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment"
 ```
 
 ## SSH connections
