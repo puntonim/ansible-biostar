@@ -15,16 +15,20 @@ The tasks performed by the playbook are:
 ## Requirements
 You need Ansible to be installed in the local machine.
 The best way to install it is to start a Python 2.7 virtual environment and then:
-    `pip install ansible`
+```
+pip install ansible
+```
 
 *Note*: during the deployment `boto` will be installed in the local machine (in the virtual environment in this case).
 
 ## Usage
 The basic usage is:
-
-`
+```
 ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
-`
+```
+
+Ansible will output the IP address of the launched EC2 instance.
+When the playbook is completed, you can then visit your new website at that address (on port 80).
 
 ### Arguments
 The are 2 groups of arguments.
@@ -48,16 +52,27 @@ The are 2 groups of arguments.
 - `git_https_repo`: Codebase to use on GitHub. Default: https://github.com/INCF/biostar-central.git.
 - `git_branch`: Branch name. Default: master.
 
+Example:
+```
+ansible-playbook site.yml --extra-vars "aws_access_key=HKJHJK aws_secret_key=ghjGHJgjHGJ volume_size=8 postgresql_username=superman postgresql_password=fgHGFHGhgfh git_https_repo=https://github.com/nimiq/biostar-central.git git_branch=new-deployment"
+```
+
 ## SSH connections
 You can SSH into the EC2 instance and into the 2 Docker containers.
 
 ### SSH into the EC2 instance
-`ssh ubuntu@<INSTANCE_IP>`  
+```
+ssh ubuntu@<INSTANCE_IP>
+```
 Ansible will output the instance IP.
 
 ### SSH into the Docker containers
 First SSH to the EC2 instance.  
 Then you can either SSH into the webapp container:  
-    `ssh root@127.0.0.1 -p 2222`  
+```
+ssh root@127.0.0.1 -p 2222
+```
 Or SSH into the PostgreSQL container:  
-    `ssh root@127.0.0.1 -p 2223`
+```
+ssh root@127.0.0.1 -p 2223
+```
