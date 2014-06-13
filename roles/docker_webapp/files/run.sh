@@ -1,2 +1,3 @@
 #!/bin/sh
-cd /root/biostar && ./biostar.sh docker
+cd /root/biostar
+exec ./biostar.sh docker 2>&1
