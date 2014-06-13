@@ -81,10 +81,41 @@ ssh root@127.0.0.1 -p 2223
 
 ## 5. Code Updates
 - SSH into the webapp Docker container
-- Update the code (or do any other change)
-- Run `exit` to close the SSH connection to the Docker container
-- Now you should be connected via SSH to the EC2 instance, run:
+- Stop the webapp Runit service, kill waitress-serve, source the env vars, do the mainainance, restart the webapp Runit service:
+```
+sv stop webapp
+killall -9 waitress-serve
+
+cd /root/biostar
+source conf/docker.env
+source /etc/container_environment.sh
+
+# Do your maintenance, f.i.:
+python managae.py my_maintenance
+
+sv start webapp
+```
+*Note*: changes are saved into the container (by meaning if you create/edit a file, the new changes are saved in the container even after a `docker stop` - the new changes are lost only if you *remove* the container `docker rm webapp`)
+
+## 6. Docker container start and stop
+If you want to start/stop a webapp container first SSH to the EC2 instance.  
+Then run:
 ```
 docker stop webapp
 docker start webapp
 ```
+
+*Note*: stopping a container does NOT make you lose the data you edited in that container. Only removing a container wirh `docker rm webapp` makes you lose the data you edited in that container.
+
+### 6.1. Restart webapp container
+Restarting the webapp container causes `biostar.sh docker` to be run again.
+This means that the following tasks will be executed:
+- install `docker.txt` requirements
+- `source conf/docker.env`
+- create the database if it does not exist
+- migrate the database
+- if the database has just been created: load the fixture and rebuild the index
+- collect static files
+- run waitress-serve
+
+Note that there is no `git pull`.
