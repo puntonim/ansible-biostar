@@ -13,19 +13,34 @@
     region: "{{ region }}"
     ec2_access_key: "{{ aws_access_key }}"
     ec2_secret_key: "{{ aws_secret_key }}"
+    # Inbound rules.
     rules:
+      # HTTP.
       - proto: tcp
         from_port: 80
         to_port: 80
         cidr_ip: 0.0.0.0/0
+      # HTTPS.
       - proto: tcp
         from_port: 443
         to_port: 443
         cidr_ip: 0.0.0.0/0
+      # SSH.
       - proto: tcp
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0
+      # ElasticSearch, Logstash, Kibana.
+      - proto: tcp
+        from_port: 9200
+        to_port: 9300
+        cidr_ip: 0.0.0.0/0
+      # Bittorrent tracker.
+      - proto: tcp
+        from_port: 6881
+        to_port: 6889
+        cidr_ip: 0.0.0.0/0
+    # Outbound rules.
     rules_egress:
       - proto: all
         from_port: 0
