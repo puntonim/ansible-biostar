@@ -87,7 +87,10 @@ ssh root@127.0.0.1 -p 2223
 ```
 
 ## 5. Container persistence
-The PostgreSQL data directory and log is stored in the EC2 instance at: 
+The PostgreSQL data directory and logs are stored in the EC2 instance at: `/home/ubuntu/workspace/docker-volumes/pgdata`.   
+The codebase is at: `/home/ubuntu/workspace/biostar`.   
+Logs of the web app are at: `/home/ubuntu/workspace/biostar/live/logs`.   
+Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
 
 ## 6. Code Updates
 - SSH into the webapp Docker container
