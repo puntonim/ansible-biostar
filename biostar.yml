@@ -2,13 +2,16 @@
 - hosts: biostarhosts
   gather_facts: False
   user: ubuntu
-  sudo: True
 
   # Those vars are here (instead of being in a default dir in a role) because they are shared
   # between the docker_postgresql and the docker_webapp role.
   vars:
     postgresql_username: biostar
     postgresql_password: biostar
+    # host_dir_for_codebase and host_dir_for_dockerfiles must be full paths (no '~').
+    host_dir_for_codebase: /home/ubuntu/workspace/biostar
+    host_dir_for_dockerfiles: /home/ubuntu/workspace/dockerfiles
+    host_dir_for_dockervolumes: /home/ubuntu/workspace/docker-volumes
 
   roles:
     - docker

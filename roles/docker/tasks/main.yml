@@ -1,34 +1,38 @@
 ---
 - name: Add docker apt key
   apt_key:
-    url=https://get.docker.io/gpg
-    state=present
+    url: https://get.docker.io/gpg
+    state: present
+  sudo: True
 
 - name: Add docker apt repo
   shell: echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
+  sudo: True
 
 - name: Install Docker
   apt:
-    name={{ item }}
-    update_cache=yes
+    name: "{{ item }}"
+    update_cache: yes
   with_items:
     - lxc-docker
     - python-pip
+  sudo: True
 
 - name: Install docker-py
   pip:
-    name=docker-py
+    name: docker-py
+  sudo: True
 
 - name: Add user ubuntu to the docker group 
   user:
-    name=ubuntu
-    groups=docker,
-    append=yes
+    name: ubuntu
+    groups: docker,
+    append: yes
+  sudo: True
 
 - name: Create host SSH private key
   command: ssh-keygen -t rsa -N "" -f /home/ubuntu/.ssh/id_rsa
     creates=/home/ubuntu/.ssh/id_rsa
-  sudo_user: ubuntu
 
 - name: Read SSH public key
   command: cat /home/ubuntu/.ssh/id_rsa.pub

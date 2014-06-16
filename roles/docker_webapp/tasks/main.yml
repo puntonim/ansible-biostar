@@ -1,39 +1,78 @@
 ---
 - name: Gathering ec2_facts 
   ec2_facts:
+  sudo: True
 
-- name: Ensure Docker server is running
-  service:
-    name=docker
-    state=started
+- name: Install git
+  apt:
+    name: git
+    update_cache: yes
+  sudo: True
+
+- name: Clone the codebase
+  git:
+    repo: "{{ git_https_repo }}"
+    version: "{{ git_branch }}"
+    dest: "{{ host_dir_for_codebase }}"
+
+- name: Copy logging, logo and less files
+  copy:
+    src: biostar
+    dest: "{{ host_dir_for_codebase }}"
+
+- name: Copy env, requirements files
+  copy:
+    src: conf
+    dest: "{{ host_dir_for_codebase }}"
+
+- name: Copy the settings file
+  template:
+    src: biostar/settings/production.py.j2
+    dest: "{{ host_dir_for_codebase }}/biostar/settings/production.py"
+
+- name: Copy run_update_index.sh
+  copy:
+    src: run_update_index.sh
+    dest: "{{ host_dir_for_codebase }}/run_update_index.sh"
+
+- name: Make run_update_index.sh executable
+  command: chmod +x {{ host_dir_for_codebase }}/run_update_index.sh
+
+- name: Copy run_webapp.sh
+  template:
+    src: run_webapp.sh.j2
+    dest: "{{ host_dir_for_codebase }}/run_webapp.sh"
+
+- name: Make run_webapp.sh executable
+  command: chmod +x {{ host_dir_for_codebase }}/run_webapp.sh
 
 - name: Create dir for Dockerfile
   file:
-    path=/tmp/docker/webapp/
-    state=directory
+    path: "{{ host_dir_for_dockerfiles}}/webapp"
+    state: directory
 
 - name: Copy the Dockerfile
   template:
-    src=Dockerfile.j2
-    dest=/tmp/docker/webapp/Dockerfile
+    src: Dockerfile.j2
+    dest: "{{ host_dir_for_dockerfiles}}/webapp/Dockerfile"
 
-- name: Copy run.sh
-  copy:
-    src=run.sh
-    dest=/tmp/docker/webapp/run.sh
+- name: Ensure Docker server is running
+  service:
+    name: docker
+    state: started
+  sudo: True
 
 - name: Build the webapp container
   command:
-    docker build -t neurostars/webapp .
-    chdir=/tmp/docker/webapp/
+    docker build -t biostar/webapp .
+    chdir="{{ host_dir_for_dockerfiles}}/webapp/"
+  sudo: True
 
 - name: Run the webapp container
   docker:
-    image=neurostars/webapp
-    name=webapp
-    ports=2222:22,80:8000
-    env="BIOSTAR_HOME=/root/biostar"
-    links=postgresql:pg
-
-- name: Delete the Dockerfile
-  command: rm /tmp/docker/webapp/Dockerfile
+    image: biostar/webapp
+    name: webapp
+    ports: 2222:22,80:8000
+    links: postgresql:pg
+    volumes: "{{ host_dir_for_codebase }}:/root/biostar"
+  sudo: True

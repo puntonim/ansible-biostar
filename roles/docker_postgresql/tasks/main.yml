@@ -1,33 +1,24 @@
 ---
 - name: Ensure Docker server is running
   service:
-    name=docker
-    state=started
+    name: docker
+    state: started
+  sudo: True
 
-- name: Create dir for Dockerfile
-  file:
-    path=/tmp/docker/postgresql/
-    state=directory
-
-- name: Copy the Dockerfile
-  template:
-    src=Dockerfile.j2
-    dest=/tmp/docker/postgresql/Dockerfile
-
-- name: Copy run.sh
-  copy:
-    src=run.sh
-    dest=/tmp/docker/postgresql/run.sh
-
-- name: Build the PostgreSQL container
-  command: docker build -t neurostars/postgresql .
-    chdir=/tmp/docker/postgresql/
+- name: Creating dir for docker volumes
+  command: mkdir -p {{ host_dir_for_dockervolumes }}
 
 - name: Run the PostgreSQL container
-  docker:
-    image=neurostars/postgresql
-    name=postgresql
-    ports=2223:22,5432:5432
+  # We do not use the Ansible docker module because it has an issue if an environment variable cantains a '='.
+  # In our case the env var SSH_PUBLIC_KEY might contain '='.
+  command: docker run -d -p 2223:22 -p 5432:5432 --name postgresql --volume={{ host_dir_for_dockervolumes }}/pgdata:/srv/pgdata -e "PG_USERNAME={{ postgresql_username }}" -e "PG_PASSWORD={{ postgresql_password }}" -e "SSH_PUBLIC_KEY={{ host_ssh_public_key.stdout }}" nimiq/postgresql93
+  sudo: True
 
-- name: Delete the Dockerfile
-  command: rm /tmp/docker/postgresql/Dockerfile
+- name: Wait for the new instance to listen on SSH port
+  # This only check if the given port is open, which is always the case for Docker containers.
+  # It does not actually check that the SSH server is up and running, so I added a delay of 30 sec.
+  wait_for:
+    state: started
+    host: 127.0.0.1
+    port: 2223
+    delay: 30

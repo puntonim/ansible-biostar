@@ -19,6 +19,9 @@ CMD ["/sbin/my_init"]
 ##################################################################################################
 ## CUSTOMIZATION
 
+# Shared volume with the codebase
+VOLUME ["/root/biostar"]
+
 # Install python, pip, git, postgresql client.
 RUN apt-get update
 RUN apt-get install -y python python-pip git postgresql-client-9.3 python-psycopg2
@@ -27,27 +30,16 @@ RUN apt-get install -y python python-pip git postgresql-client-9.3 python-psycop
 RUN echo "*:*:*:{{ postgresql_username }}:{{ postgresql_password }}" > /root/.pgpass
 RUN chmod 0600 /root/.pgpass
 
-ENV PG_USERNAME {{ postgresql_username }}
-ENV BIOSTAR_IPS {{ ansible_ec2_public_ipv4 }},{{ ansible_ec2_public_hostname }}
-
 # Expose SSH and webserver ports.
 EXPOSE 8000 22
 
-# Create the folder /root/biostar.
-RUN mkdir /root/biostar
-RUN cd /root/biostar && git clone {{ git_https_repo }} . && git checkout {{ git_branch }}
-
 # Launch Django and run migrations when starting the container.
 ENV BIOSTAR_HOME /root/biostar
-WORKDIR /root/biostar
 
-# Ensure the directory for logs is created.
-RUN mkdir /root/biostar/live/logs
-
-# Setup the boot script run by /sbin/my_init.
+# Add the webapp daemon: a Runit script executed on a `docker run`.
+# Runit will keep the daemon up and running, restarting it when it crashes.
 RUN mkdir /etc/service/webapp
-ADD run.sh /etc/service/webapp/run
-RUN chmod +x /etc/service/webapp/run
+RUN ln -s /root/biostar/run_webapp.sh /etc/service/webapp/run
 
 # Install host's SSH public key.
 RUN echo "{{ host_ssh_public_key.stdout }}" >> /root/.ssh/authorized_keys
@@ -64,10 +56,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ## HOW TO USE IT
 #
 # Build:
-#     docker build -t neurostars/webapp .
+#     docker build -t biostar/webapp .
 # Run:
-#     docker run -d --link postgresql:pg -p 80:8000 --name webapp neurostars/webapp
-# Run with an interactive shell:
-#     docker run -ti --link postgresql:pg -p 80:8000 --name webapp neurostars/webapp bash
-# Start:
-#     docker start webapp
+#     docker run -d --link postgresql:pg -p 80:8000 -p 2222:22 --volume=/mylocaldir:/root/biostar --name webapp biostar/webapp

@@ -1,0 +1,56 @@
+#!/bin/bash
+
+add_update_index_to_crontab () {
+    crontab -l | grep run_update_index
+    res=`echo $?`
+    # If:
+    # res = 0 the command is already in the cron tab
+    # res = 1 the command is not in the cron tab
+    if [ "$res" -eq 1 ]; then
+        echo " * Adding the update index command to the crontab..."
+        crontab -l | { cat; echo "*/10 * * * * /root/biostar/run_update_index.sh"; } | crontab -
+
+    else
+        echo " * The update index command is already in the crontab..."
+    fi
+}
+
+cd $BIOSTAR_HOME
+
+echo " * Installing requirements..."
+pip install -r conf/requirements/production.txt
+
+echo " * Setting environment variables..."
+source conf/production.env
+
+echo " * Creating the database..."
+set +e
+createdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME
+res=`echo $?`
+# If:
+# res = 1 then the DB did already exist
+# res = 0 then the DB has just been created
+
+echo " * Migrating the database..."
+python manage.py syncdb -v 1 --noinput
+python manage.py migrate biostar.apps.users
+python manage.py migrate biostar.apps.posts
+python manage.py migrate
+
+if [ "$res" -eq 0 ]; then
+    echo " * Initializing the database..."
+    python manage.py initialize_site
+    python manage.py loaddata $JSON_DATA_FIXTURE
+    python manage.py rebuild_index --noinput
+else
+    echo " * Skipping initialization of the database..."
+fi
+
+echo " * Collectstatic..."
+python manage.py collectstatic --noinput
+
+# Adding the update index command to the crontab
+add_update_index_to_crontab
+
+echo " * Running the server..."
+waitress-serve --port=8000 --call biostar.wsgi:white

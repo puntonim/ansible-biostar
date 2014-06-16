@@ -1,0 +1,102 @@
+# -*- coding: utf8 -*-
+#
+# Production settings
+#
+from .base import *
+
+from logging.config import dictConfig
+from .logger_production import LOGGING
+dictConfig(LOGGING)
+
+# Turn off debug mode on deployed servers.
+DEBUG = False
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': get_env("DATABASE_NAME"),
+        'USER': '{{ postgresql_username }}',
+        'PASSWORD': '{{ postgresql_password }}',
+        'HOST': get_env("PG_PORT_5432_TCP_ADDR"),
+        'PORT': get_env("PG_PORT_5432_TCP_PORT", func=int),
+    }
+}
+
+SITE_NAME = get_env("SITE_NAME")
+
+# Email config: most of the settings are automatically loaded from production.env.
+#EMAIL_HOST = get_env("EMAIL_HOST")  # Automatically loaded in base.py from production.env.
+#EMAIL_PORT = get_env("EMAIL_PORT", func=int)  # Automatically loaded in base.py from production.env.
+#EMAIL_HOST_USER = get_env("EMAIL_HOST_USER")  # Automatically loaded in base.py from production.env.
+#EMAIL_HOST_PASSWORD = get_env("EMAIL_HOST_PASSWORD")  # Automatically loaded in base.py from production.env.
+#DEFAULT_FROM_EMAIL = get_env("DEFAULT_FROM_EMAIL")  # Automatically loaded in base.py from production.env.
+EMAIL_USE_TLS = bool(get_env("EMAIL_USE_TLS", func=int))
+EMAIL_BACKEND = get_env("EMAIL_BACKEND")
+
+# The google id will injected as a template variable.
+GOOGLE_TRACKER = get_env("GOOGLE_TRACKER")
+GOOGLE_DOMAIN = get_env("GOOGLE_DOMAIN")
+
+# The site logo.
+SITE_LOGO = get_env("SITE_LOGO")
+# The default CSS file to load.
+SITE_STYLE_CSS = get_env("SITE_STYLE_CSS")
+
+# # Setting a cookie with email:signed_hash(email)
+# # will automatically create accounts
+# EXTERNAL_AUTH = [
+#     ("foo.bar.com", "ABC"),
+# ]
+
+# # Set these to redirect login to an external site.
+# EXTERNAL_LOGIN_URL = None
+# EXTERNAL_SIGNUP_URL = None
+# EXTERNAL_LOGOUT_URL = None
+# EXTERNAL_SESSION_KEY = "EXTERNAL"
+# EXTERNAL_SESSION_FIELDS = "title tag_val content".split()
+
+SESSION_COOKIE_NAME = "%s" % SITE_NAME
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[%s] " % SITE_NAME
+
+try:
+    ALLOWED_HOSTS.extend(['{{ ansible_ec2_public_ipv4 }}', '{{ ansible_ec2_public_hostname }}'])
+except ImproperlyConfigured:
+    pass
+
+
+
+##################################################################################################
+## START CUSTOM PART
+
+# The start categories. These tags have special meaning internally.
+START_CATEGORIES = [
+    "Latest",  "Open",
+]
+
+# These should be the most frequent (or special) tags on the site.
+NAVBAR_TAGS = [
+    "neuroinformatics", "fmri", "mri", "pipeline",
+]
+
+# The last categories. These tags have special meaning internally.
+END_CATEGORIES = [
+    "Tutorials", "Tools",  "Jobs", "Forum",
+]
+
+# These are the tags that always show up in the tag recommendation dropdown.
+POST_TAG_LIST = NAVBAR_TAGS + ["software error"]
+
+TIME_ZONE = 'Europe/Stockholm'
+ADMIN_LOCATION = "Stockholm, Sweden"
+
+# What domain will handle the replies.
+EMAIL_REPLY_PATTERN = "reply+%s+code@neurostars.org"
+# The format of the email that is sent
+EMAIL_FROM_PATTERN = u"%s on Neurostars <%s>"
+# The secret key that is required to parse the email
+EMAIL_REPLY_SECRET_KEY = "abc"
+# The subject of the reply goes here
+EMAIL_REPLY_SUBJECT = u"[neurostars] %s"
+
+## END CUSTOM PART
+##################################################################################################
