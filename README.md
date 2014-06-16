@@ -92,7 +92,15 @@ The codebase is at: `/home/ubuntu/workspace/biostar`.
 Logs of the web app are at: `/home/ubuntu/workspace/biostar/live/logs`.   
 Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
 
-## 6. Code Updates
+## 6. Code Updates and Maintenance
+### 6.1. Basic Code Updates
+- SSH into the EC2 instance
+- `cd /home/ubuntu/workspace/biostar`
+- Do your code edits/updates, f.i.: `git pull`
+- `docker webapp stop`
+- `docker webapp start`
+
+### 6.2. Proper Maintenance
 - SSH into the webapp Docker container
 - Stop the webapp Runit service, kill waitress-serve, source the env vars, do the mainainance, restart the webapp Runit service:
 ```
