@@ -19,21 +19,28 @@ The best way to install it is to start a Python 2.7 virtual environment and then
 pip install ansible
 ```
 
-*Note*: during the deployment `boto` will be installed in the local machine (in the virtual environment in this case).
+*Note*: during the deployment `boto` and `git` will be installed in the local machine (in the virtual environment in this case).
 
 ## 3. Usage
-The basic usage is:
+1. Clone this repo
+2. Use your custom Django configuration by editing the files:
+  - [roles/docker_webapp/files/conf/production.env](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/conf/production.env)
+  - [roles/docker_webapp/templates/biostar/settings/production.py.j2](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/templates/biostar/settings/production.py.j2): section "START CUSTOM PART"
+3. Run the Ansible playbook, the basic usage is:
 ```
 ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
 ```
 
+
 Ansible will output the IP address of the launched EC2 instance.
 When the playbook is completed, you can then visit your new website at that address (on port 80).
 
-On a t1.micro instance it takes about 20 mins.
+On a t1.micro instance it takes about 12 mins.
 
-### 3.1. Arguments
-The are 2 groups of arguments.
+*Note*: we are trying to move all the cutom parts to production.env so that in the 2nd step there is only one file to edit.
+
+### 3.1. Playbook Advanced Arguments
+The are 2 groups of arguments for the playbook.
 
 **Amazon AWS**: arguments to define the new EC2 instance that will be launched.
 
@@ -51,7 +58,7 @@ The are 2 groups of arguments.
 
 - `postgresql_username`: Username to use when creating the PostgreSQL database. Default: biostar.
 - `postgresql_password`: Password to use when creating the PostgreSQL database. Default: biostar.
-- `git_https_repo`: Codebase to use on GitHub. Default: https://github.com/INCF/biostar-central.git.
+- `git_https_repo`: Codebase to use on GitHub. Default: https://github.com/ialbert/biostar-central.git.
 - `git_branch`: Branch name. Default: master.
 
 Example:
@@ -79,7 +86,21 @@ Or SSH into the PostgreSQL container:
 ssh root@127.0.0.1 -p 2223
 ```
 
-## 5. Code Updates
+## 5. Container persistence
+The PostgreSQL data directory and logs are stored in the EC2 instance at: `/home/ubuntu/workspace/docker-volumes/pgdata`.   
+The codebase is at: `/home/ubuntu/workspace/biostar`.   
+Logs of the web app are at: `/home/ubuntu/workspace/biostar/live/logs`.   
+Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
+
+## 6. Code Updates and Maintenance
+### 6.1. Basic Code Updates
+- SSH into the EC2 instance
+- `cd /home/ubuntu/workspace/biostar`
+- Do your code edits/updates, f.i.: `git pull`
+- `docker webapp stop`
+- `docker webapp start`
+
+### 6.2. Proper Maintenance
 - SSH into the webapp Docker container
 - Stop the webapp Runit service, kill waitress-serve, source the env vars, do the mainainance, restart the webapp Runit service:
 ```
@@ -91,13 +112,13 @@ source conf/docker.env
 source /etc/container_environment.sh
 
 # Do your maintenance, f.i.:
-python managae.py my_maintenance
+python manage.py my_maintenance
 
 sv start webapp
 ```
 *Note*: changes are saved into the container (by meaning if you create/edit a file, the new changes are saved in the container even after a `docker stop` - the new changes are lost only if you *remove* the container `docker rm webapp`)
 
-## 6. Docker container start and stop
+## 7. Docker container start and stop
 If you want to start/stop a webapp container first SSH to the EC2 instance.  
 Then run:
 ```
@@ -107,11 +128,11 @@ docker start webapp
 
 *Note*: stopping a container does NOT make you lose the data you edited in that container. Only removing a container wirh `docker rm webapp` makes you lose the data you edited in that container.
 
-### 6.1. Restart webapp container
-Restarting the webapp container causes `biostar.sh docker` to be run again.
+### 7.1. Restart webapp container
+Restarting the webapp container causes `run_webapp.sh` to be run again.
 This means that the following tasks will be executed:
-- install `docker.txt` requirements
-- `source conf/docker.env`
+- install requirements
+- `source conf/production.env`
 - create the database if it does not exist
 - migrate the database
 - if the database has just been created: load the fixture and rebuild the index
