@@ -91,7 +91,7 @@ source conf/docker.env
 source /etc/container_environment.sh
 
 # Do your maintenance, f.i.:
-python managae.py my_maintenance
+python manage.py my_maintenance
 
 sv start webapp
 ```
