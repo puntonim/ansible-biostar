@@ -27,9 +27,9 @@ SITE_NAME = get_env("SITE_NAME")
 # Email config: most of the settings are automatically loaded from production.env.
 #EMAIL_HOST = get_env("EMAIL_HOST")  # Automatically loaded in base.py from production.env.
 #EMAIL_PORT = get_env("EMAIL_PORT", func=int)  # Automatically loaded in base.py from production.env.
-#EMAIL_HOST_USER = get_env("EMAIL_HOST_USER")  # Automatically loaded in base.py from production.env.
-#EMAIL_HOST_PASSWORD = get_env("EMAIL_HOST_PASSWORD")  # Automatically loaded in base.py from production.env.
 #DEFAULT_FROM_EMAIL = get_env("DEFAULT_FROM_EMAIL")  # Automatically loaded in base.py from production.env.
+#EMAIL_HOST_USER = get_env("EMAIL_HOST_USER")  # Automatically loaded in base.py from production.env.
+EMAIL_HOST_PASSWORD = get_env("EMAIL_HOST_PASSWORD", func=str)
 EMAIL_USE_TLS = bool(get_env("EMAIL_USE_TLS", func=int))
 EMAIL_BACKEND = get_env("EMAIL_BACKEND")
 
