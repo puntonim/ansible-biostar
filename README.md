@@ -27,6 +27,7 @@ pip install ansible
   - copy the file [roles/docker_webapp/files/conf/production.env.template](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/conf/production.env.template) to `production.env` in the same folder and edit its `CUSTOM SECTION`.   
 *Note*: `production.env` is ignored by git, so your passwords are safe!
   - edit the `CUSTOM SECTION` of [roles/docker_webapp/templates/biostar/settings/production.py.j2](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/templates/biostar/settings/production.py.j2)
+  - add your favicon replacing the file: [roles/docker_webapp/files/biostar/static/favicon.ico](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/biostar/static/favicon.ico)
 3. Run the Ansible playbook, the basic usage is:
 ```
 ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
@@ -38,7 +39,7 @@ When the playbook is completed, you can then visit your new website at that addr
 
 On a t1.micro instance it takes about 12 mins.
 
-*Note*: we are trying to move all the cutom parts to production.env so that in the 2nd step there is only one file to edit.
+*Note*: we are trying to move all the custom parts to `production.env` so that there is only one file to edit.
 
 ### 3.1. Playbook Advanced Arguments
 The are 2 groups of arguments for the playbook.
