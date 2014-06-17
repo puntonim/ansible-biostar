@@ -40,7 +40,7 @@ python manage.py migrate
 if [ "$res" -eq 0 ]; then
     echo " * Initializing the database..."
     python manage.py initialize_site
-    python manage.py loaddata $JSON_DATA_FIXTURE
+    #python manage.py loaddata $JSON_DATA_FIXTURE
     python manage.py rebuild_index --noinput
 else
     echo " * Skipping initialization of the database..."

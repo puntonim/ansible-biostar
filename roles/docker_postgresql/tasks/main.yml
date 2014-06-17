@@ -5,9 +5,6 @@
     state: started
   sudo: True
 
-- name: Creating dir for docker volumes
-  command: mkdir -p {{ host_dir_for_dockervolumes }}
-
 - name: Run the PostgreSQL container
   # We do not use the Ansible docker module because it has an issue if an environment variable cantains a '='.
   # In our case the env var SSH_PUBLIC_KEY might contain '='.
