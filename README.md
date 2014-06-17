@@ -23,9 +23,10 @@ pip install ansible
 
 ## 3. Usage
 1. Clone this repo
-2. Use your custom Django configuration by editing the files:
-  - [roles/docker_webapp/files/conf/production.env](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/conf/production.env)
-  - [roles/docker_webapp/templates/biostar/settings/production.py.j2](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/templates/biostar/settings/production.py.j2): section "START CUSTOM PART"
+2. Use your custom Django configuration:
+  - copy the file [roles/docker_webapp/files/conf/production.env.template](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/conf/production.env.template) to `production.env` in the same folder and edit its `CUSTOM SECTION`.   
+*Note*: `production.env` is ignored by git, so your passwords are safe!
+  - edit the `CUSTOM SECTION` of [roles/docker_webapp/templates/biostar/settings/production.py.j2](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/templates/biostar/settings/production.py.j2)
 3. Run the Ansible playbook, the basic usage is:
 ```
 ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
