@@ -110,7 +110,7 @@ sv stop webapp
 killall -9 waitress-serve
 
 cd /root/biostar
-source conf/docker.env
+source conf/production.env
 source /etc/container_environment.sh
 
 # Do your maintenance, f.i.:
