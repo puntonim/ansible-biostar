@@ -38,7 +38,7 @@ When the playbook is completed, you can then visit your new website at that addr
 
 On a t1.micro instance it takes about 12 mins.
 
-*Note*: we are trying to move all the cutom parts to production.env so that in the 2nd step there is only one file to edit.
+*Note*: we are trying to move all the custom parts to `production.env` so that there is only one file to edit.
 
 ### 3.1. Playbook Advanced Arguments
 The are 2 groups of arguments for the playbook.
