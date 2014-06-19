@@ -38,6 +38,8 @@
       #   to_port: 6889
       #   cidr_ip: 0.0.0.0/0
     # Outbound rules.
+    # TODO: in some cases (like for INCF's AWS account) it is not possible to create outbound rules.
+    # In such cases, just comment out the `rules_egress:` section.
     rules_egress:
       - proto: all
         from_port: 0
@@ -68,7 +70,8 @@
     volumes:
       - volume_size: "{{ volume_size }}"
         device_name: /dev/sda1
-        delete_on_termination: True
+        device_type: standard
+        #delete_on_termination: True
   register: ec2_info
 
 - name: Print info about the launched instance
