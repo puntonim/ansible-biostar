@@ -2,10 +2,13 @@
 
 ## 0. QuickStart
 
-XXX: Super brief way to deploy all this (between 1 and 3 steps, no more), i.e
+TODO: Brief way to deploy all this between 1 and 3 steps, no more. Oneliners preferred here.
+
+Should cover all supported cloud services, i.e:
 
 ``
-ansible-playbook gce.yml --extra-vars="gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>" -i /etc/ansible/hosts
+ansible-playbook site.yml --extra-vars "cloud_provider=aws aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
+ansible-playbook site.yml --extra-vars="cloud_provider=gce gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>" -i /etc/ansible/hosts
 ``
 
 ## 1. Overview
