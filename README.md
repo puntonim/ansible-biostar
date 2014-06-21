@@ -7,6 +7,8 @@ TODO: Brief way to deploy all this between 1 and 3 steps, no more. Oneliners pre
 Should cover all supported cloud services, i.e:
 
 ``
+ansible-galaxy install nimiq.ansible-biostar
+
 ansible-playbook site.yml --extra-vars "cloud_provider=aws aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
 ansible-playbook site.yml --extra-vars="cloud_provider=gce gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>" -i /etc/ansible/hosts
 ``
