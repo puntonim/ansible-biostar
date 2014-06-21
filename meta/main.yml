@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: Paolo Coffetti and Roman Valls Guimera
+  description: "A role that deploys biostar-central, a Q&A stackexchange-like website"
+  license: GPLv3
+  min_ansible_version: 1.6
+  platforms:
+    - name: Ubuntu
+      versions:
+      - saucy
+  categories:
+    - web

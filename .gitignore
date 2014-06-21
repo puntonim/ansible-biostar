@@ -60,3 +60,9 @@ docs/_build/
 
 # Production file with passwords
 production.env
+
+# Certificates
+*.p12
+*.pkcs12
+*.pem
+*.crt

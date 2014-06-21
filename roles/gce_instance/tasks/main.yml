@@ -1,0 +1,29 @@
+---
+- name: "Convert the GCE .p12 file to .pem RSA key"
+  local_action: shell openssl pkcs12 -in roles/gce_instance/files/gce-private-notasecret.p12 -passin pass:notasecret -nodes -nocerts | openssl rsa -out roles/gce_instance/files/pkey.pem
+
+- name: "Download CA keychain for apache-libcloud"
+  local_action: command wget https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt -O roles/gce_instance/files/ca-bundle.crt
+
+- name: "Launch Google Compute Engine instance"
+  environment:
+     SSL_CERT_FILE: roles/gce_instance/files/ca-bundle.crt
+  gce:
+      instance_names: "{{ site_name }}"
+      machine_type: "{{ machine_type }}"
+      image: "{{ image }}"
+      service_account_email: "{{ gce_service_email }}"
+      pem_file: roles/gce_instance/files/pkey.pem
+      project_id: "{{ gce_prj_name }}"
+  register: gce
+
+- name: "Wait for SSH to come up"
+  wait_for: host={{ item.public_ip }} port=22 delay=10 timeout=60
+  with_items: gce.instance_data
+
+- name: "Group newly created instances"
+  add_host: hostname={{ item.public_ip }} groupname=new_instances
+  with_items: gce.instance_data
+
+- name: "Add host public key to GCE instance"
+  local_action: shell gcutil --service_version="v1" --project={{ gce_prj_id }} ssh --zone={{ zone }} {{ site_name }}
