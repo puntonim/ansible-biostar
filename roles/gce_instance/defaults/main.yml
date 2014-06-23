@@ -1,0 +1,5 @@
+---
+site_name: biostars
+image: debian-7
+machine_type: n1-standard-1
+zone: us-central1-a

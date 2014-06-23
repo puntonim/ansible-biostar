@@ -38,7 +38,7 @@
       #   to_port: 6889
       #   cidr_ip: 0.0.0.0/0
     # Outbound rules.
-    # TODO: in some cases (like for INCF's AWS account) it is not possible to create outbound rules.
+    # Note: in some cases (like for INCF's AWS account) it is not possible to create outbound rules.
     # In such cases, just comment out the `rules_egress:` section.
     rules_egress:
       - proto: all

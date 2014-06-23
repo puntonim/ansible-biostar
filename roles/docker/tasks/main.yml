@@ -12,7 +12,7 @@
 - name: Install Docker
   apt:
     name: "{{ item }}"
-    update_cache: yes
+    update_cache: True
   with_items:
     - lxc-docker
     - python-pip
@@ -27,7 +27,7 @@
   user:
     name: ubuntu
     groups: docker,
-    append: yes
+    append: True
   sudo: True
 
 - name: Create host SSH private key
