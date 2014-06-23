@@ -1,19 +1,15 @@
 # Ansible deployment for Biostar-based projects
 
-## 0. QuickStart
+## 1. QuickStart
 
-TODO: Brief way to deploy all this between 1 and 3 steps, no more. Oneliners preferred here.
+```
+ansible-galaxy install nimiq.biostar
+ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
+```
 
-Should cover all supported cloud services, i.e:
+TODO: add gce and test it gce
 
-``
-ansible-galaxy install nimiq.ansible-biostar
-
-ansible-playbook site.yml --extra-vars "cloud_provider=aws aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
-ansible-playbook site.yml --extra-vars="cloud_provider=gce gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>" -i /etc/ansible/hosts
-``
-
-## 1. Overview
+## 2. Overview
 
 An Ansible playbook to automate the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 or GCE instances using Docker containers.
 
@@ -26,7 +22,7 @@ The tasks performed by the playbook are:
 - Build and run a Docker container with PostgreSQL 9.3.
 - Build and run a Docker container with [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
 
-## 2. Requirements
+## 3. Requirements
 
 You need Ansible to be installed in the local machine.
 The best way to install it is to start a Python 2.7 virtual environment and then:
@@ -37,7 +33,7 @@ pip install ansible
 
 *Note*: during the deployment `boto` and `git` will be installed in the local machine (in the virtual environment in this case).
 
-## 3. Usage
+## 4. Usage
 
 1. `git clone http://github.com/nimiq/ansible-biostar`
 2. Use your custom Django configuration:
@@ -58,7 +54,7 @@ On a t1.micro instance it takes about 12 mins.
 
 *Note*: we are trying to move all the custom parts to `production.env` so that there is only one file to edit.
 
-### 3.1. Playbook Advanced Arguments
+### 4.1. Playbook Advanced Arguments
 
 The are 2 groups of arguments for the playbook.
 
@@ -87,18 +83,18 @@ Example:
 ansible-playbook site.yml --extra-vars "aws_access_key=HKJHJK aws_secret_key=ghjGHJgjHGJ volume_size=8 postgresql_username=superman postgresql_password=fgHGFHGhgfh git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment"
 ```
 
-## 4. SSH Connections
+## 5. SSH Connections
 
 You can SSH into the EC2 instance and into the 2 Docker containers.
 
-### 4.1. SSH Into The EC2 Instance
+### 5.1. SSH Into The EC2 Instance
 
 ```
 ssh ubuntu@<INSTANCE_IP>
 ```
 Ansible will output the instance IP.
 
-### 4.2. SSH Into The Docker Containers
+### 5.2. SSH Into The Docker Containers
 
 First SSH to the EC2 instance.  
 Then you can either SSH into the webapp container:  
@@ -113,15 +109,15 @@ Or SSH into the PostgreSQL container:
 ssh root@127.0.0.1 -p 2223
 ```
 
-## 5. Container persistence
+## 6. Container persistence
 
 The PostgreSQL data directory and logs are stored in the EC2 instance at: `/home/ubuntu/workspace/docker-volumes/pgdata`.   
 The codebase is at: `/home/ubuntu/workspace/biostar`.   
 Logs of the web app are at: `/home/ubuntu/workspace/biostar/live/logs`.   
 Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
 
-## 6. Code Updates and Maintenance
-### 6.1. Basic Code Updates
+## 7. Code Updates and Maintenance
+### 7.1. Basic Code Updates
 
 - SSH into the EC2 instance
 - `cd /home/ubuntu/workspace/biostar`
@@ -129,7 +125,7 @@ Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
 - `docker stop webapp`
 - `docker start webapp`
 
-### 6.2. Proper Maintenance
+### 7.2. Proper Maintenance
 
 - SSH into the webapp Docker container
 - Stop the webapp Runit service, kill waitress-serve, source the env vars, do the mainainance, restart the webapp Runit service:
@@ -150,7 +146,7 @@ sv start webapp
 
 *Note*: changes are saved into the container (by meaning if you create/edit a file, the new changes are saved in the container even after a `docker stop` - the new changes are lost only if you *remove* the container `docker rm webapp`)
 
-## 7. Docker container start and stop
+## 8. Docker container start and stop
 
 If you want to start/stop a webapp container first SSH to the EC2 instance.  
 Then run:
@@ -162,7 +158,7 @@ docker start webapp
 
 *Note*: stopping a container does NOT make you lose the data you edited in that container. Only removing a container wirh `docker rm webapp` makes you lose the data you edited in that container.
 
-### 7.1. Restart webapp container
+### 8.1. Restart webapp container
 
 Restarting the webapp container causes `run_webapp.sh` to be run again.
 This means that the following tasks will be executed:
