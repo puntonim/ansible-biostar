@@ -126,8 +126,8 @@ Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
 - SSH into the EC2 instance
 - `cd /home/ubuntu/workspace/biostar`
 - Do your code edits/updates, f.i.: `git pull`
-- `docker webapp stop`
-- `docker webapp start`
+- `docker stop webapp`
+- `docker start webapp`
 
 ### 6.2. Proper Maintenance
 
