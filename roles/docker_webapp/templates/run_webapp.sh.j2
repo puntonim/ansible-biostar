@@ -52,5 +52,5 @@ python manage.py collectstatic --noinput
 # Adding the update index command to the crontab
 add_update_index_to_crontab
 
-echo " * Running the server..."
+echo " * Running waitress web server on port 8000..."
 waitress-serve --port=8000 --call biostar.wsgi:white
