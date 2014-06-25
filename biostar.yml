@@ -1,5 +1,6 @@
 ---
-- hosts: biostarhosts
+- name: Deploy Biostar codebase
+  hosts: biostarhosts
   gather_facts: False
   user: ubuntu
 
@@ -14,6 +15,5 @@
     host_dir_for_dockervolumes: /srv/docker-volumes
 
   roles:
-    - docker
     - docker_postgresql
     - docker_webapp

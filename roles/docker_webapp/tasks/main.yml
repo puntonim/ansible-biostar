@@ -3,6 +3,24 @@
   ec2_facts:
   sudo: True
 
+- name: Read host SSH public key
+  command: cat /home/ubuntu/.ssh/id_rsa.pub
+  register: host_ssh_public_key
+
+- name: Create dirs for codebase and dockerfiles
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0755
+    recurse: True
+  with_items:
+    - "{{ host_dir_for_dockerfiles }}"
+    - "{{ host_dir_for_dockerfiles }}/webapp"
+    - "{{ host_dir_for_codebase }}"
+  sudo: True
+
 - name: Install git
   apt:
     name: git
@@ -45,11 +63,6 @@
 
 - name: Make run_webapp.sh executable
   command: chmod +x {{ host_dir_for_codebase }}/run_webapp.sh
-
-- name: Create dir for Dockerfile
-  file:
-    path: "{{ host_dir_for_dockerfiles}}/webapp"
-    state: directory
 
 - name: Copy the Dockerfile
   template:

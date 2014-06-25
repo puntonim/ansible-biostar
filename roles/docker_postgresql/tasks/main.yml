@@ -1,4 +1,17 @@
 ---
+- name: Read host SSH public key
+  command: cat /home/ubuntu/.ssh/id_rsa.pub
+  register: host_ssh_public_key
+
+- name: Create dir for Docker volumes
+  file:
+    path: "{{ host_dir_for_dockervolumes }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0755
+  sudo: True
+
 - name: Ensure Docker server is running
   service:
     name: docker
@@ -11,7 +24,7 @@
   command: docker run -d -p 2223:22 -p 5432:5432 --name postgresql --volume={{ host_dir_for_dockervolumes }}/pgdata:/srv/pgdata -e "PG_USERNAME={{ postgresql_username }}" -e "PG_PASSWORD={{ postgresql_password }}" -e "SSH_PUBLIC_KEY={{ host_ssh_public_key.stdout }}" nimiq/postgresql93
   sudo: True
 
-- name: Wait for the new instance to listen on SSH port
+- name: Wait for the new container to listen on SSH port
   # This only check if the given port is open, which is always the case for Docker containers.
   # It does not actually check that the SSH server is up and running, so I added a delay of 30 sec.
   wait_for:

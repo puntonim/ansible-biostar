@@ -16,7 +16,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': get_env("DATABASE_NAME"),
         'USER': '{{ postgresql_username }}',
-        'PASSWORD': '{{ postgresql_password }}',
+        'PASSWORD': '',  # No need of password cause we use a /root/.pgpass file.
         'HOST': get_env("PG_PORT_5432_TCP_ADDR"),
         'PORT': get_env("PG_PORT_5432_TCP_PORT", func=int),
     }

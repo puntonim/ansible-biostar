@@ -1,7 +1,19 @@
 ---
-- hosts: localhost
+- name: Launch a Google Compute Engine instance from localhost
+  hosts: localhost
   connection: local
   gather_facts: False
 
   roles:
     - gce_instance
+
+# TODO: test this!
+# - name: Provision the GCE instance with Docker
+#   hosts: biostarhosts
+#   gather_facts: False
+#   user: ubuntu
+
+#   roles:
+#     - docker
+
+# - include: biostar.yml

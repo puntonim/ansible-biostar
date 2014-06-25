@@ -1,0 +1,16 @@
+---
+- name: Gather ec2 facts
+  ec2_facts:
+
+- name: Copy script to create swap file (only for micro instances)
+  copy:
+    src: create_swap.sh
+    dest: /tmp/create_swap.sh
+    mode: 0700
+  sudo: True
+  when: ansible_ec2_instance_type == "t1.micro"
+
+- name: Create swapfile (only for micro instances)
+  shell: /tmp/create_swap.sh
+  sudo: True
+  when: ansible_ec2_instance_type == "t1.micro"

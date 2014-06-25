@@ -1,0 +1,19 @@
+---
+- name: Launch an Amazon EC2 instance from localhost
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  roles:
+    - ec2_instance
+
+- name: Provision the EC2 instance with swapfile and Docker
+  hosts: biostarhosts
+  gather_facts: False
+  user: ubuntu
+
+  roles:
+    - swapfile
+    - docker
+
+- include: biostar.yml

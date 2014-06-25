@@ -33,15 +33,3 @@
 - name: Create host SSH private key
   command: ssh-keygen -t rsa -N "" -f /home/ubuntu/.ssh/id_rsa
     creates=/home/ubuntu/.ssh/id_rsa
-
-- name: Read SSH public key
-  command: cat /home/ubuntu/.ssh/id_rsa.pub
-  register: host_ssh_public_key
-
-- name: Create working dirs
-  shell: mkdir {{ host_dir_for_codebase }} && mkdir {{ host_dir_for_dockerfiles }} && mkdir {{ host_dir_for_dockervolumes }}
-  sudo: True
-
-- name: Set permissions on working dirs
-  shell: chown ubuntu:ubuntu {{ host_dir_for_codebase }} && chown ubuntu:ubuntu {{ host_dir_for_dockerfiles }} && chown ubuntu:ubuntu {{ host_dir_for_dockervolumes }}
-  sudo: True
