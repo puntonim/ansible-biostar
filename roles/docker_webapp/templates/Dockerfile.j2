@@ -58,4 +58,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Build:
 #     docker build -t biostar/webapp .
 # Run:
-#     docker run -d --link postgresql:pg -p 80:8000 -p 2222:22 --volume=/mylocaldir:/root/biostar --name webapp biostar/webapp
+#     docker run -d --link postgresql:pg -p 80:8000 -p 2222:22 --volume={{ host_dir_for_codebase }}:/root/biostar --name webapp biostar/webapp
