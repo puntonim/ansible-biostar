@@ -1,18 +1,19 @@
 ---
-- name: Gathering ec2_facts 
-  ec2_facts:
-  sudo: True
+# - name: Gathering ec2_facts 
+#   ec2_facts:
+#   sudo: True
 
 - name: Read host SSH public key
-  command: cat /home/ubuntu/.ssh/id_rsa.pub
+  command: cat ~/.ssh/id_rsa.pub
   register: host_ssh_public_key
 
 - name: Create dirs for codebase and dockerfiles
   file:
     path: "{{ item }}"
     state: directory
+    ##########################
     owner: ubuntu
-    group: ubuntu
+    group: ubunut
     mode: 0755
     recurse: True
   with_items:
@@ -33,6 +34,9 @@
     version: "{{ git_branch }}"
     dest: "{{ host_dir_for_codebase }}"
 
+- name: Crete logs folder
+  shell: mkdir -p {{ host_dir_for_codebase }}/live/logs
+
 - name: Copy logging, logo and less files
   copy:
     src: biostar
@@ -48,26 +52,35 @@
     src: biostar/settings/production.py.j2
     dest: "{{ host_dir_for_codebase }}/biostar/settings/production.py"
 
-- name: Copy run_update_index.sh
-  copy:
-    src: run_update_index.sh
-    dest: "{{ host_dir_for_codebase }}/run_update_index.sh"
+- name: Copy run-update-index.sh
+  template:
+    src: run-update-index.sh.j2
+    dest: "{{ host_dir_for_codebase }}/run-update-index.sh"
 
 - name: Make run_update_index.sh executable
-  command: chmod +x {{ host_dir_for_codebase }}/run_update_index.sh
+  command: chmod +x {{ host_dir_for_codebase }}/run-update-index.sh
 
-- name: Copy run_webapp.sh
+- name: Copy run-webapp.sh
   template:
-    src: run_webapp.sh.j2
-    dest: "{{ host_dir_for_codebase }}/run_webapp.sh"
+    src: run-webapp.sh.j2
+    dest: "{{ host_dir_for_codebase }}/run-webapp.sh"
 
-- name: Make run_webapp.sh executable
-  command: chmod +x {{ host_dir_for_codebase }}/run_webapp.sh
+- name: Make run-webapp.sh executable
+  command: chmod +x {{ host_dir_for_codebase }}/run-webapp.sh
 
 - name: Copy the Dockerfile
   template:
     src: Dockerfile.j2
     dest: "{{ host_dir_for_dockerfiles}}/webapp/Dockerfile"
+
+- name: Copy nginx-biostar.conf
+  template:
+    src: nginx-biostar.conf.j2
+    dest: "{{ host_dir_for_dockerfiles}}/webapp/nginx-biostar.conf"
+
+- name: Change ownership of the codebase dir to www-data
+  shell: chown -R www-data:www-data /srv/biostar-codebase
+  sudo: True
 
 - name: Ensure Docker server is running
   service:
@@ -85,7 +98,7 @@
   docker:
     image: biostar/webapp
     name: webapp
-    ports: 2222:22,80:8000
+    ports: 2222:22,80:80
     links: postgresql:pg
-    volumes: "{{ host_dir_for_codebase }}:/root/biostar"
+    volumes: "{{ host_dir_for_codebase }}:{{ container_dir_for_codebase }}"
   sudo: True

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd {{ container_dir_for_codebase }}
+source conf/production.env
+source container_environment.sh
+RES=`python manage.py update_index`
+echo `date` - $RES >> {{ container_dir_for_codebase }}/live/logs/rebuild_index.log

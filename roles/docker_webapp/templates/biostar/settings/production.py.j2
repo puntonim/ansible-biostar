@@ -4,10 +4,6 @@
 #
 from .base import *
 
-from logging.config import dictConfig
-from .logger_production import LOGGING
-dictConfig(LOGGING)
-
 # Turn off debug mode on deployed servers.
 DEBUG = False
 

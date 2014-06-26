@@ -8,20 +8,21 @@ add_update_index_to_crontab () {
     # res = 1 the command is not in the cron tab
     if [ "$res" -eq 1 ]; then
         echo " * Adding the update index command to the crontab..."
-        crontab -l | { cat; echo "*/10 * * * * /root/biostar/run_update_index.sh"; } | crontab -
+        crontab -l | { cat; echo "*/10 * * * * exec /sbin/setuser www-data {{ container_dir_for_codebase }}/run_update_index.sh"; } | crontab -
 
     else
         echo " * The update index command is already in the crontab..."
     fi
 }
 
-cd $BIOSTAR_HOME
+cd {{ container_dir_for_codebase }}
 
 echo " * Installing requirements..."
 pip install -r conf/requirements/production.txt
 
 echo " * Setting environment variables..."
 source conf/production.env
+#####source container_environment.sh
 
 echo " * Creating the database..."
 set +e
@@ -53,4 +54,6 @@ python manage.py collectstatic --noinput
 add_update_index_to_crontab
 
 echo " * Running waitress web server on port 8000..."
+#chown -R www-data:www-data {{ container_dir_for_codebase }}
+#exec /sbin/setuser www-data waitress-serve --port=8000 --call biostar.wsgi:white
 waitress-serve --port=8000 --call biostar.wsgi:white

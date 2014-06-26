@@ -13,6 +13,7 @@
     host_dir_for_codebase: /srv/biostar-codebase
     host_dir_for_dockerfiles: /srv/dockerfiles
     host_dir_for_dockervolumes: /srv/docker-volumes
+    container_dir_for_codebase: /srv/biostar
 
   roles:
     - docker_postgresql
