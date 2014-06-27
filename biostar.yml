@@ -9,7 +9,7 @@
   vars:
     postgresql_username: biostar
     postgresql_password: biostar
-    # host_dir_for_codebase and host_dir_for_dockerfiles must be full paths (no '~').
+    # The following paths must be full paths (no '~').
     host_dir_for_codebase: /srv/biostar-codebase
     host_dir_for_dockerfiles: /srv/dockerfiles
     host_dir_for_dockervolumes: /srv/docker-volumes

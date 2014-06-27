@@ -19,7 +19,7 @@ CMD ["/sbin/my_init"]
 ##################################################################################################
 ## CUSTOMIZATION
 
-# Shared volume with the codebase
+# Shared volume with the codebase.
 VOLUME ["{{ container_dir_for_codebase }}"]
 
 # Install python, pip, git, postgresql client.
@@ -34,7 +34,7 @@ RUN echo "*:*:*:{{ postgresql_username }}:{{ postgresql_password }}" > /var/www/
 RUN chown -R www-data:www-data /var/www
 RUN chmod 0600 /var/www/.pgpass
 
-# Copy nginx config file
+# Copy nginx config file.
 COPY nginx-biostar.conf /etc/nginx/sites-available/biostar
 RUN ln -s /etc/nginx/sites-available/biostar /etc/nginx/sites-enabled/biostar
 RUN rm /etc/nginx/sites-enabled/default
@@ -42,28 +42,15 @@ RUN rm /etc/nginx/sites-enabled/default
 # Expose SSH and webserver ports.
 EXPOSE 80 22
 
-# Set biostar home.
-ENV BIOSTAR_HOME {{ container_dir_for_codebase }}
-
 # Add the Nginx start script (executed on a `docker run`).
-RUN echo -n "#!" > /etc/my_init.d/01_start_nginx.sh
-RUN echo "/bin/bash" >> /etc/my_init.d/01_start_nginx.sh
-RUN echo "exec service nginx start" >> /etc/my_init.d/01_start_nginx.sh
+RUN echo '#!/bin/bash' > /etc/my_init.d/01_start_nginx.sh
+RUN echo 'exec service nginx start' >> /etc/my_init.d/01_start_nginx.sh
 RUN chmod +x /etc/my_init.d/01_start_nginx.sh
 
 # Add the webapp daemon: a Runit script executed on a `docker run`.
 # Runit will keep the daemon up and running, restarting it when it crashes.
 RUN mkdir /etc/service/webapp
 RUN ln -s {{ container_dir_for_codebase }}/run-webapp.sh /etc/service/webapp/run
-
-# Add the webapp start script (executed on a `docker run`).
-# RUN echo -n "#!" > /etc/my_init.d/02_start_biostar.sh
-# RUN echo "/bin/bash" >> /etc/my_init.d/02_start_biostar.sh
-# RUN echo "cp /etc/container_environment.sh {{ container_dir_for_codebase }}/" >> /etc/my_init.d/02_start_biostar.sh
-# RUN echo "chown www-data:www-data {{ container_dir_for_codebase }}/container_environment.sh" >> /etc/my_init.d/02_start_biostar.sh
-# RUN echo "exec /sbin/setuser www-data {{ container_dir_for_codebase }}/run-webapp.sh" >> /etc/my_init.d/02_start_biostar.sh
-# RUN chmod +x /etc/my_init.d/02_start_biostar.sh
-####RUN ln -s {{ container_dir_for_codebase }}/run-webapp.sh /etc/service/webapp/run
 
 # Install host's SSH public key.
 RUN echo "{{ host_ssh_public_key.stdout }}" >> /root/.ssh/authorized_keys
@@ -82,4 +69,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Build:
 #     docker build -t biostar/webapp .
 # Run:
-#     docker run -d --link postgresql:pg -p 80:8000 -p 2222:22 --volume={{ host_dir_for_codebase }}:{{ container_dir_for_codebase }} --name webapp biostar/webapp
+#     docker run -d --link postgresql:pg -p 80:80 -p 2222:22 --volume={{ host_dir_for_codebase }}:{{ container_dir_for_codebase }} --name webapp biostar/webapp

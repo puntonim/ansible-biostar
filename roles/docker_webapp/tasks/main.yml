@@ -1,7 +1,7 @@
 ---
-# - name: Gathering ec2_facts 
-#   ec2_facts:
-#   sudo: True
+- name: Gathering ec2_facts 
+  ec2_facts:
+  sudo: True
 
 - name: Read host SSH public key
   command: cat ~/.ssh/id_rsa.pub
@@ -11,9 +11,8 @@
   file:
     path: "{{ item }}"
     state: directory
-    ##########################
     owner: ubuntu
-    group: ubunut
+    group: ubuntu
     mode: 0755
     recurse: True
   with_items:
@@ -56,17 +55,19 @@
   template:
     src: run-update-index.sh.j2
     dest: "{{ host_dir_for_codebase }}/run-update-index.sh"
-
-- name: Make run_update_index.sh executable
-  command: chmod +x {{ host_dir_for_codebase }}/run-update-index.sh
+    owner: www-data
+    group: www-data 
+    mode: 0755
+  sudo: True
 
 - name: Copy run-webapp.sh
   template:
     src: run-webapp.sh.j2
     dest: "{{ host_dir_for_codebase }}/run-webapp.sh"
-
-- name: Make run-webapp.sh executable
-  command: chmod +x {{ host_dir_for_codebase }}/run-webapp.sh
+    owner: www-data
+    group: www-data 
+    mode: 0755
+  sudo: True
 
 - name: Copy the Dockerfile
   template:
@@ -77,10 +78,6 @@
   template:
     src: nginx-biostar.conf.j2
     dest: "{{ host_dir_for_dockerfiles}}/webapp/nginx-biostar.conf"
-
-- name: Change ownership of the codebase dir to www-data
-  shell: chown -R www-data:www-data /srv/biostar-codebase
-  sudo: True
 
 - name: Ensure Docker server is running
   service:

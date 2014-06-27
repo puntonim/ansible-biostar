@@ -1,6 +1,8 @@
 #!/bin/bash
 
 add_update_index_to_crontab () {
+    # Write the update index task to crontab
+
     crontab -l | grep run_update_index
     res=`echo $?`
     # If:
@@ -8,10 +10,49 @@ add_update_index_to_crontab () {
     # res = 1 the command is not in the cron tab
     if [ "$res" -eq 1 ]; then
         echo " * Adding the update index command to the crontab..."
-        crontab -l | { cat; echo "*/10 * * * * exec /sbin/setuser www-data {{ container_dir_for_codebase }}/run_update_index.sh"; } | crontab -
+        crontab -l | { cat; echo "*/10 * * * * {{ container_dir_for_codebase }}/run-update-index.sh"; } | crontab -
 
     else
         echo " * The update index command is already in the crontab..."
+    fi
+}
+
+create_database () {
+    # Create the database if not already existent
+
+    res=`psql -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} postgres -c "SELECT datname FROM pg_database WHERE datistemplate = false AND datname='$DATABASE_NAME';" | grep '^(1 row)$'`
+    # If:
+    # res = 0 the database already exists
+    # res = 1 the database does not exist
+    if [ "$res" -eq 1 ]; then
+        echo " * Creating the database..."
+        createdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME
+        newdb=0
+    else
+        echo " * Database alredy existent..."
+        newdb=1
+    fi
+}
+
+fix_nginx_config_file () {
+    # Fix Nginx biostar config file adding the right domain
+
+    if  [[ $BIOSTAR_HOSTNAME == www.* ]]
+    then
+        WWW="www."
+        CLEAN=${BIOSTAR_HOSTNAME#${WWW}}
+        echo " * Adding $BIOSTAR_HOSTNAME to Nginx site config file for Biostar..."
+        sed -ri "0,/^(\s*server_name [^ \t\r\n\v\f]+ )(xxxx);$/s//\1$BIOSTAR_HOSTNAME;/" /etc/nginx/sites-enabled/biostar
+        echo " * Adding $CLEAN to Nginx site config file for Biostar..."
+        sed -ri "0,/^(\s*server_name )(xxxx);$/s//\1$CLEAN;/" /etc/nginx/sites-enabled/biostar
+        sed -ri "0,/^(\s*rewrite \^\(\.\*\) http\:\/\/)(www.xxxx)(.?1 permanent);$/s//\1www.$CLEAN\3;/" /etc/nginx/sites-enabled/biostar
+    else
+        CLEAN=www.$BIOSTAR_HOSTNAME
+        echo " * Adding $BIOSTAR_HOSTNAME to Nginx site config file for Biostar..."
+        sed -ri "0,/^(\s*server_name [^ \t\r\n\v\f]+ )(xxxx);$/s//\1$BIOSTAR_HOSTNAME;/" /etc/nginx/sites-enabled/biostar
+        echo " * Adding $CLEAN to Nginx site config file for Biostar..."
+        sed -ri "0,/^(\s*server_name )(xxxx);$/s//\1$CLEAN;/" /etc/nginx/sites-enabled/biostar
+        sed -ri "0,/^(\s*rewrite \^\(\.\*\) http\:\/\/)(www.xxxx)(.?1 permanent);$/s//\1$BIOSTAR_HOSTNAME\3;/" /etc/nginx/sites-enabled/biostar
     fi
 }
 
@@ -22,15 +63,9 @@ pip install -r conf/requirements/production.txt
 
 echo " * Setting environment variables..."
 source conf/production.env
-#####source container_environment.sh
 
-echo " * Creating the database..."
-set +e
-createdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME
-res=`echo $?`
-# If:
-# res = 1 then the DB did already exist
-# res = 0 then the DB has just been created
+# Create the database if not already existent
+create_database
 
 echo " * Migrating the database..."
 python manage.py syncdb -v 1 --noinput
@@ -38,7 +73,7 @@ python manage.py migrate biostar.apps.users
 python manage.py migrate biostar.apps.posts
 python manage.py migrate
 
-if [ "$res" -eq 0 ]; then
+if [ "$newdb" -eq 0 ]; then
     echo " * Initializing the database..."
     python manage.py initialize_site
     #python manage.py loaddata $JSON_DATA_FIXTURE
@@ -50,10 +85,12 @@ fi
 echo " * Collectstatic..."
 python manage.py collectstatic --noinput
 
-# Adding the update index command to the crontab
+# Add the update index command to the crontab
 add_update_index_to_crontab
 
+# Add the right domain to Nginx site config file
+fix_nginx_config_file
+
 echo " * Running waitress web server on port 8000..."
-#chown -R www-data:www-data {{ container_dir_for_codebase }}
-#exec /sbin/setuser www-data waitress-serve --port=8000 --call biostar.wsgi:white
-waitress-serve --port=8000 --call biostar.wsgi:white
+chown -R www-data:www-data /srv/biostar
+exec /sbin/setuser www-data waitress-serve --port=8000 --call biostar.wsgi:white

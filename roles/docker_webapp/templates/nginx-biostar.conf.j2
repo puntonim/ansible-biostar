@@ -12,7 +12,7 @@ server {
 server {
     listen 80;
     client_max_body_size 5M;
-    server_name {{ ansible_ec2_public_ipv4 }} {{ ansible_ec2_public_hostname }};
+    server_name {{ ansible_ec2_public_ipv4 }} xxxx;
 
     keepalive_timeout 25s;
 
@@ -39,7 +39,7 @@ server {
         expires max;
         add_header Pragma public;
         add_header Cache-Control "public";
-        access_log off;
+        #access_log off;
     }
 
     location / {
@@ -51,9 +51,9 @@ server {
     }
 }
 
-# Redirect non www domains.
+# Redirect www/non-www domains.
 server {
     listen 80;
-    server_name staging.neurostars.org;
-    rewrite ^(.*) http://www.staging.neurostars.org$1 permanent;
+    server_name xxxx;
+    rewrite ^(.*) http://www.xxxx$1 permanent;
 }
