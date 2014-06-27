@@ -9,7 +9,7 @@ ansible-playbook aws.yml --extra-vars "aws_access_key=<YOUR_KEY> aws_secret_key=
 # Or deploy to a Google Compute Engine instance (**TODO** not working yet):
 ansible-playbook gce.yml --extra-vars "gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>"
 ```
-**TODO**: fix and test GCE.
+**TODO**: fix, test and document GCE.
 
 ## 2. Overview
 
@@ -22,7 +22,7 @@ The tasks performed by the playbook are:
 - Launch an Amazon EC2 instance.
 - Install Docker in the instance.
 - Build and run a Docker container with PostgreSQL 9.3.
-- Build and run a Docker container with [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
+- Build and run a Docker container with Nginx and [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
 
 ## 3. Requirements
 
@@ -46,7 +46,7 @@ pip install ansible
 3. Run the Ansible playbook, the basic usage is:
 
 ```
-ansible-playbook site.yml --extra-vars "aws_access_key=YOUR_KEY aws_secret_key=YOUR_SECRET"
+ansible-playbook aws.yml --extra-vars "aws_access_key=<YOUR_KEY> aws_secret_key=<YOUR_SECRET>"
 ```
 
 Ansible will output the IP address of the launched EC2 instance.
@@ -82,7 +82,7 @@ The are 2 groups of arguments for the playbook.
 Example:
 
 ```
-ansible-playbook site.yml --extra-vars "aws_access_key=HKJHJK aws_secret_key=ghjGHJgjHGJ volume_size=8 postgresql_username=superman postgresql_password=fgHGFHGhgfh git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment"
+ansible-playbook aws.yml --extra-vars "aws_access_key=ABCDE aws_secret_key=AbcDeFghiJ volume_size=8 postgresql_username=superman postgresql_password=kryptonite git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment"
 ```
 
 ## 5. SSH Connections
@@ -113,10 +113,11 @@ ssh root@127.0.0.1 -p 2223
 
 ## 6. Container persistence
 
-The PostgreSQL data directory and logs are stored in the EC2 instance at: `/home/ubuntu/workspace/docker-volumes/pgdata`.   
-The codebase is at: `/home/ubuntu/workspace/biostar`.   
-Logs of the web app are at: `/home/ubuntu/workspace/biostar/live/logs`.   
-Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
+The PostgreSQL data directory and logs are stored in the EC2 instance at: `/srv/docker-volumes/pgdata`.   
+The codebase is at: `/srv/biostar-codebase`.   
+Logs of the web app are at: `/srv/biostar-codebase/live/logs`.   
+Django media files are at: `/srv/biostar-codebase/live/export/media`.
+Django static files are at: `/srv/biostar-codebase/live/export/static`.
 
 ## 7. Code Updates and Maintenance
 ### 7.1. Basic Code Updates
@@ -136,7 +137,7 @@ Django media files are at: `/home/ubuntu/workspace/biostar/live/export/media`.
 sv stop webapp
 killall -9 waitress-serve
 
-cd /root/biostar
+cd /srv/biostar
 source conf/production.env
 source /etc/container_environment.sh
 
