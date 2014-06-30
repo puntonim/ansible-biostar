@@ -5,9 +5,9 @@
 ```
 ansible-galaxy install nimiq.biostar
 # Deploy to an Amazon EC2 instance:
-ansible-playbook aws.yml --extra-vars "aws_access_key=<YOUR_KEY> aws_secret_key=<YOUR_SECRET>"
+ansible-playbook aws.yml --extra-vars 'aws_access_key=<YOUR_KEY> aws_secret_key=<YOUR_SECRET>'
 # Or deploy to a Google Compute Engine instance (**TODO** not working yet):
-ansible-playbook gce.yml --extra-vars "gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>"
+ansible-playbook gce.yml --extra-vars 'gce_service_email=<SERVICE_ACCOUNT_EMAIL> gce_prj_name=<PRJ_NAME>'
 ```
 **TODO**: fix, test and document GCE.
 
@@ -46,7 +46,7 @@ pip install ansible
 3. Run the Ansible playbook, the basic usage is:
 
 ```
-ansible-playbook aws.yml --extra-vars "aws_access_key=<YOUR_KEY> aws_secret_key=<YOUR_SECRET>"
+ansible-playbook aws.yml --extra-vars 'aws_access_key=<YOUR_KEY> aws_secret_key=<YOUR_SECRET>'
 ```
 
 Ansible will output the IP address of the launched EC2 instance.
@@ -84,7 +84,7 @@ The are 2 groups of arguments for the playbook.
 Example:
 
 ```
-ansible-playbook aws.yml --extra-vars "aws_access_key=ABCDE aws_secret_key=AbcDeFghiJ volume_size=8 postgresql_username=superman postgresql_password=kryptonite git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment basic_auth_username=testuser basic_auth_password=mypassword"
+ansible-playbook aws.yml --extra-vars 'aws_access_key=ABCDE aws_secret_key=AbcDeFghiJ volume_size=8 postgresql_username=superman postgresql_password=kryptonite git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment basic_auth_username=testuser basic_auth_password=mypassword'
 ```
 
 ## 5. SSH Connections

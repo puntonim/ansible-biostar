@@ -20,12 +20,14 @@ add_update_index_to_crontab () {
 create_database () {
     # Create the database if not already existent
 
-    res=`psql -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} postgres -c "SELECT datname FROM pg_database WHERE datistemplate = false AND datname='$DATABASE_NAME';" | grep '^(1 row)$'`
+    echo " * Checking if the database already exists (this operation might give an error to be ignored)..."
+    psql -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME -c "SELECT id FROM users_user;"
+    res=`echo $?`
     # If:
     # res = 0 the database already exists
-    # res = 1 the database does not exist
+    # res != 0 the database does not exist
     if [ "$res" -eq 1 ]; then
-        echo " * Creating the database..."
+        echo " * Creating the database (this operation might give an error to be ignored)..."
         createdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME
         newdb=0
     else
