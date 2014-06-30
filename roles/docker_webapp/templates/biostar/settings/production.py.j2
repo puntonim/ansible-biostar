@@ -55,7 +55,12 @@ SESSION_COOKIE_NAME = "%s" % SITE_NAME
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[%s] " % SITE_NAME
 
 try:
+    # Add public IP to the allowed hosts list.
     ALLOWED_HOSTS.extend(['{{ ansible_ec2_public_ipv4 }}'])
+
+    # Add extra domains list to the allowed hosts list.
+    extra_domains_list = get_env("BIOSTAR_EXTRA_HOSTNAMES").split(' ')
+    ALLOWED_HOSTS.extend(x for x in extra_domains_list if x)
 except ImproperlyConfigured:
     pass
 

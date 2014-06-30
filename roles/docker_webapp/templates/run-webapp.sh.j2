@@ -37,19 +37,18 @@ create_database () {
 fix_nginx_config_file () {
     # Fix Nginx biostar config file adding the right domain
 
+    echo " * Adding $BIOSTAR_HOSTNAME to Nginx site config file for Biostar..."
+    sed -ri "0,/^(\s*server_name [^ \t\r\n\v\f]+ )(xxxx);$/s//\1$BIOSTAR_HOSTNAME $BIOSTAR_EXTRA_HOSTNAMES;/" /etc/nginx/sites-enabled/biostar
+
     if  [[ $BIOSTAR_HOSTNAME == www.* ]]
     then
         WWW="www."
         CLEAN=${BIOSTAR_HOSTNAME#${WWW}}
-        echo " * Adding $BIOSTAR_HOSTNAME to Nginx site config file for Biostar..."
-        sed -ri "0,/^(\s*server_name [^ \t\r\n\v\f]+ )(xxxx);$/s//\1$BIOSTAR_HOSTNAME;/" /etc/nginx/sites-enabled/biostar
         echo " * Adding $CLEAN to Nginx site config file for Biostar..."
         sed -ri "0,/^(\s*server_name )(xxxx);$/s//\1$CLEAN;/" /etc/nginx/sites-enabled/biostar
         sed -ri "0,/^(\s*rewrite \^\(\.\*\) http\:\/\/)(www.xxxx)(.?1 permanent);$/s//\1www.$CLEAN\3;/" /etc/nginx/sites-enabled/biostar
     else
         CLEAN=www.$BIOSTAR_HOSTNAME
-        echo " * Adding $BIOSTAR_HOSTNAME to Nginx site config file for Biostar..."
-        sed -ri "0,/^(\s*server_name [^ \t\r\n\v\f]+ )(xxxx);$/s//\1$BIOSTAR_HOSTNAME;/" /etc/nginx/sites-enabled/biostar
         echo " * Adding $CLEAN to Nginx site config file for Biostar..."
         sed -ri "0,/^(\s*server_name )(xxxx);$/s//\1$CLEAN;/" /etc/nginx/sites-enabled/biostar
         sed -ri "0,/^(\s*rewrite \^\(\.\*\) http\:\/\/)(www.xxxx)(.?1 permanent);$/s//\1$BIOSTAR_HOSTNAME\3;/" /etc/nginx/sites-enabled/biostar
