@@ -79,6 +79,19 @@
     src: nginx-biostar.conf.j2
     dest: "{{ host_dir_for_dockerfiles}}/webapp/nginx-biostar.conf"
 
+- name: Install passlib
+  pip:
+    name: passlib
+  sudo: True
+  when: basic_auth_username is defined and basic_auth_password is defined
+
+- name: Crete auth-basic password file
+  htpasswd:
+    path: "{{ host_dir_for_dockerfiles}}/webapp/biostar-auth"
+    name: "{{ basic_auth_username }}"
+    password: "{{ basic_auth_password }}"
+  when: basic_auth_username is defined and basic_auth_password is defined
+
 - name: Ensure Docker server is running
   service:
     name: docker

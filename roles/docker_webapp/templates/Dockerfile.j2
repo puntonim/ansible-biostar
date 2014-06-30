@@ -39,6 +39,13 @@ COPY nginx-biostar.conf /etc/nginx/sites-available/biostar
 RUN ln -s /etc/nginx/sites-available/biostar /etc/nginx/sites-enabled/biostar
 RUN rm /etc/nginx/sites-enabled/default
 
+{% if basic_auth_username is defined and basic_auth_password is defined %}
+# Copy basic auth file.
+COPY biostar-auth /etc/nginx/biostar-auth
+RUN chown www-data:www-data /etc/nginx/biostar-auth
+RUN chmod 0600 /etc/nginx/biostar-auth
+{% endif %}
+
 # Expose SSH and webserver ports.
 EXPOSE 80 22
 

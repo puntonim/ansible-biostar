@@ -78,11 +78,13 @@ The are 2 groups of arguments for the playbook.
 - `postgresql_password`: Password to use when creating the PostgreSQL database. Default: biostar.
 - `git_https_repo`: Codebase to use on GitHub. Default: https://github.com/ialbert/biostar-central.git.
 - `git_branch`: Branch name. Default: master.
+- `basic_auth_username`: Username to use for HTTP Basic authentication. If not provided, no HTTP Basic authentication is setup in Nginx.
+- `basic_auth_password`: Password to use for HTTP Basic authentication in Nginx. If not provided, no HTTP Basic authentication is setup in Nginx.
 
 Example:
 
 ```
-ansible-playbook aws.yml --extra-vars "aws_access_key=ABCDE aws_secret_key=AbcDeFghiJ volume_size=8 postgresql_username=superman postgresql_password=kryptonite git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment"
+ansible-playbook aws.yml --extra-vars "aws_access_key=ABCDE aws_secret_key=AbcDeFghiJ volume_size=8 postgresql_username=superman postgresql_password=kryptonite git_https_repo=https://github.com/my_user/biostar-central.git git_branch=new-deployment basic_auth_username=testuser basic_auth_password=mypassword"
 ```
 
 ## 5. SSH Connections

@@ -48,6 +48,11 @@ server {
         proxy_redirect off;
         proxy_pass http://biostar_server;
         proxy_buffering off;
+
+        {% if basic_auth_username is defined and basic_auth_password is defined %}
+        auth_basic "Staging Neurostars Restricted";
+        auth_basic_user_file /etc/nginx/biostar-auth;
+        {% endif %}
     }
 }
 
