@@ -22,7 +22,9 @@ ansible-playbook gce.yml --extra-vars 'gce_service_email=<SERVICE_ACCOUNT_EMAIL>
 - [5. SSH Connections](#5-ssh-connections)
   - [5.1. SSH Into The EC2 Instance](#51-ssh-into-the-ec2-instance)
   - [5.2. SSH Into The Docker Containers](#52-ssh-into-the-docker-containers)
-- [6. Container persistence](#6-container-persistence)
+- [6. Containers Persistence and Logs](#6-container-persistence)
+  - [6.1. `postgresql` container](#61-postgresql-container)
+  - [6.2. `webapp` container](#62-webapp-container)
 - [7. Code Updates and Maintenance](#7-code-updates-and-maintenance)
   - [7.1. Basic Code Updates](#71-basic-code-updates)
   - [7.2. Proper Maintenance](#72-proper-maintenance)
@@ -41,8 +43,8 @@ The tasks performed by the playbook are:
 - Create an Amazon Key Pair with the public SSH key of the machine used to run Ansible.
 - Launch an Amazon EC2 instance.
 - Install Docker in the instance.
-- Build and run a Docker container with PostgreSQL 9.3.
-- Build and run a Docker container with Nginx and [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
+- Build and run a Docker container named `postgresql` with PostgreSQL 9.3.
+- Build and run a Docker container named `webapp` with Nginx and [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
 
 ## 3. Requirements
 
@@ -133,13 +135,16 @@ Or SSH into the PostgreSQL container:
 ssh root@127.0.0.1 -p 2223
 ```
 
-## 6. Container persistence
+## 6. Containers Persistence and Logs
+### 6.1. `postgresql` container
+The PostgreSQL data directory is in a shared volume stored in the EC2 host instance in: `/srv/docker-volumes/pgdata`.  
+The log file is in: `/srv/docker-volumes/pgdata/logs`.
 
-The PostgreSQL data directory and logs are stored in the EC2 instance at: `/srv/docker-volumes/pgdata`.   
-The codebase is at: `/srv/biostar-codebase`.   
-Logs of the web app are at: `/srv/biostar-codebase/live/logs`.   
-Django media files are at: `/srv/biostar-codebase/live/export/media`.
-Django static files are at: `/srv/biostar-codebase/live/export/static`.
+### 6.2. `webapp` container
+The codebase is in a shared volume stored in the EC2 host instance in: `/srv/biostar-codebase`.   
+In particular, Django media files are in: `/srv/biostar-codebase/live/export/media`.  
+And Django static files are in: `/srv/biostar-codebase/live/export/static`.  
+Log files are in: `/srv/biostar-codebase/live/logs/`.
 
 ## 7. Code Updates and Maintenance
 ### 7.1. Basic Code Updates
