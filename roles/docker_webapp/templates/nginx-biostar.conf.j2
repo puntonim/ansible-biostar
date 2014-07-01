@@ -1,7 +1,8 @@
 upstream biostar_server {
-    #server unix:/tmp/biostar.sock fail_timeout=0;
-    # For a TCP configuration:
-    server localhost:8000 fail_timeout=0;
+    # Unix socket connection:
+    server unix:/tmp/biostar.sock fail_timeout=0;
+    # TCP connection:
+    #server localhost:8000 fail_timeout=0;
 }
 
 # When no server names match then crash out.

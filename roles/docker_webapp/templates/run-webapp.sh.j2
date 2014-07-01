@@ -94,4 +94,7 @@ fix_nginx_config_file
 
 echo " * Running waitress web server on port 8000..."
 chown -R www-data:www-data /srv/biostar
-exec /sbin/setuser www-data waitress-serve --port=8000 --call biostar.wsgi:white
+# TCP connection:
+#exec /sbin/setuser www-data waitress-serve --port=8000 --call biostar.wsgi:white
+# Unix socket connection:
+exec /sbin/setuser www-data waitress-serve --unix-socket=/tmp/biostar.sock --call biostar.wsgi:white
