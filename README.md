@@ -11,6 +11,26 @@ ansible-playbook gce.yml --extra-vars 'gce_service_email=<SERVICE_ACCOUNT_EMAIL>
 ```
 **TODO**: fix, test and document GCE.
 
+***
+## Table of Contents
+
+- [1. QuickStart](#1-quickstart)
+- [2. Overview](#2-overview)
+- [3. Requirements](#3-requirements)
+- [4. Usage](#4-usage)
+  - [4.1. Playbook Advanced Arguments](#41-playbook-advanced-arguments)
+- [5. SSH Connections](#5-ssh-connections)
+  - [5.1. SSH Into The EC2 Instance](#51-ssh-into-the-ec2-instance)
+  - [5.2. SSH Into The Docker Containers](#52-ssh-into-the-docker-containers)
+- [6. Container persistence](#6-container-persistence)
+- [7. Code Updates and Maintenance](#7-code-updates-and-maintenance)
+  - [7.1. Basic Code Updates](#71-basic-code-updates)
+  - [7.2. Proper Maintenance](#72-proper-maintenance)
+- [8. Docker container start and stop](#8-docker-container-start-and-stop)
+  - [8.1. Restart webapp container](#81-restart-webapp-container)
+
+***
+
 ## 2. Overview
 
 An Ansible playbook to automate the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 or GCE instances using Docker containers.
