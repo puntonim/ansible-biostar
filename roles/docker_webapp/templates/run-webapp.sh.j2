@@ -21,7 +21,7 @@ create_database () {
     # Create the database if not already existent
 
     echo " * Checking if the database already exists (this operation might give an error to be ignored)..."
-    psql -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME -c "SELECT id FROM users_user;"
+    psql -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME -c "SELECT id FROM users_user WHERE id=1;"
     res=`echo $?`
     # If:
     # res = 0 the database already exists
