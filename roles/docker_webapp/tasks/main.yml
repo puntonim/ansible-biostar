@@ -36,7 +36,7 @@
 - name: Crete logs folder
   shell: mkdir -p {{ host_dir_for_codebase }}/live/logs
 
-- name: Copy logging, logo and less files
+- name: Copy logging file
   copy:
     src: biostar
     dest: "{{ host_dir_for_codebase }}"

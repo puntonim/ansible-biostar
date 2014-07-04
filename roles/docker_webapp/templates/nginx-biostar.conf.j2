@@ -24,7 +24,7 @@ server {
     error_log {{ container_dir_for_codebase }}/live/logs/nginx-error.log;
 
     location = /favicon.ico {
-        alias   {{ container_dir_for_codebase }}/live/export/static/favicon.ico;
+        alias   {{ container_dir_for_codebase }}/live/export/static/themes/neurostars/img/favicon.ico;
     }
 
     location = /sitemap.xml {

@@ -102,5 +102,13 @@ EMAIL_REPLY_SECRET_KEY = "abc"
 # The subject of the reply goes here
 EMAIL_REPLY_SUBJECT = u"[neurostars] %s"
 
+# The theme dir with logo, css and flatpage files.
+THEME_DIR = os.path.join("themes", "neurostars")
+FLATPAGE_IMPORT_DIR = abspath(STATIC_DIR, THEME_DIR, "pages")
+# The site logo.
+SITE_LOGO = os.path.join(THEME_DIR, "img", "neurostars.logo.png")
+# The default CSS file to load.
+SITE_STYLE_CSS = os.path.join(THEME_DIR, "css", "neurostars.style.less")
+
 ## CUSTOM SECTION END
 ##################################################################################################
