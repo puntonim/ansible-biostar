@@ -55,6 +55,23 @@ SITE_STYLE_CSS = get_env("SITE_STYLE_CSS")
 # EXTERNAL_SESSION_KEY = "EXTERNAL"
 # EXTERNAL_SESSION_FIELDS = "title tag_val content".split()
 
+# Facebook and ORCID social login provider are commented out in `base.py` so
+# we have to enable them here.
+INSTALLED_APPS.append('allauth.socialaccount.providers.facebook')
+INSTALLED_APPS.append('allauth.socialaccount.providers.orcid')
+SOCIALACCOUNT_PROVIDERS['facebook'] = {
+    'SCOPE': ['email'],
+    'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+    'METHOD': 'oauth2',
+    'LOCALE_FUNC': lambda x: 'en_US',
+    'PROVIDER_KEY': get_env("FACEBOOK_PROVIDER_KEY"),
+    'PROVIDER_SECRET_KEY': get_env("FACEBOOK_PROVIDER_SECRET_KEY"),
+}
+SOCIALACCOUNT_PROVIDERS['orcid'] = {
+    'PROVIDER_KEY': get_env("ORCID_PROVIDER_KEY"),
+    'PROVIDER_SECRET_KEY': get_env("ORCID_PROVIDER_SECRET_KEY"),
+}
+
 SESSION_COOKIE_NAME = "%s" % SITE_NAME
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[%s] " % SITE_NAME
 
