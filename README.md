@@ -102,6 +102,7 @@ The are 2 groups of arguments for the playbook.
 - `git_branch`: Branch name. Default: master.
 - `basic_auth_username`: Username to use for HTTP Basic authentication. If not provided, no HTTP Basic authentication is setup in Nginx.
 - `basic_auth_password`: Password to use for HTTP Basic authentication in Nginx. If not provided, no HTTP Basic authentication is setup in Nginx.
+- `load_sample_data`: Automatically loads sample data. Values: yes, no. Default: no.
 
 Example:
 
@@ -150,8 +151,8 @@ Log files are in: `/srv/biostar-codebase/live/logs/`.
 ### 7.1. Basic Code Updates
 
 - SSH into the EC2 instance
-- `cd /home/ubuntu/workspace/biostar`
-- Do your code edits/updates, f.i.: `git pull`
+- `cd /srv/biostar-codebase`
+- Do your code edits/updates as user www-data, f.i.: `sudo -u www-data git pull`
 - `docker stop webapp`
 - `docker start webapp`
 
