@@ -78,7 +78,9 @@ if [ "$newdb" -eq 0 ]; then
     # A new database has just been created and migrated.
     echo " * Initializing the database..."
     python manage.py initialize_site
-    #python manage.py loaddata $JSON_DATA_FIXTURE
+    {% if load_sample_data and  load_sample_data != 'no' %}
+    python manage.py loaddata $JSON_DATA_FIXTURE
+    {% endif %}
     python manage.py rebuild_index --noinput
 else
     echo " * Skipping initialization of the database..."
