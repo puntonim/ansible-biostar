@@ -150,8 +150,8 @@ Log files are in: `/srv/biostar-codebase/live/logs/`.
 ### 7.1. Basic Code Updates
 
 - SSH into the EC2 instance
-- `cd /home/ubuntu/workspace/biostar`
-- Do your code edits/updates, f.i.: `git pull`
+- `cd /srv/biostar-codebase`
+- Do your code edits/updates as user www-data, f.i.: `sudo -u www-data git pull`
 - `docker stop webapp`
 - `docker start webapp`
 
