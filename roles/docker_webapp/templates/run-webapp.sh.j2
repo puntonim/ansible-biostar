@@ -3,14 +3,15 @@
 add_update_index_to_crontab () {
     # Write the update index task to crontab
 
-    crontab -l | grep run_update_index
+    command="run-update-index.sh"
+    crontab -l | grep $command
     res=`echo $?`
     # If:
     # res = 0 the command is already in the cron tab
     # res = 1 the command is not in the cron tab
     if [ "$res" -eq 1 ]; then
         echo " * Adding the update index command to the crontab..."
-        crontab -l | { cat; echo "*/10 * * * * {{ container_dir_for_codebase }}/run-update-index.sh"; } | crontab -
+        crontab -l | { cat; echo "*/10 * * * * {{ container_dir_for_codebase }}/$command"; } | crontab -
 
     else
         echo " * The update index command is already in the crontab..."
