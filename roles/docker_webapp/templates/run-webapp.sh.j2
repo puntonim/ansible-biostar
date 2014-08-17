@@ -26,13 +26,13 @@ create_database () {
     # If:
     # res = 0 the database already exists
     # res != 0 the database does not exist
-    if [ "$res" -eq 1 ]; then
+    if [ "$res" -eq 0 ]; then
+        echo " * Database already existent..."
+        newdb=1
+    else
         echo " * Creating the database (this operation might give an error to be ignored)..."
         createdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U {{ postgresql_username }} $DATABASE_NAME
         newdb=0
-    else
-        echo " * Database alredy existent..."
-        newdb=1
     fi
 }
 
@@ -75,6 +75,7 @@ python manage.py migrate biostar.apps.posts
 python manage.py migrate
 
 if [ "$newdb" -eq 0 ]; then
+    # A new database has just been created and migrated.
     echo " * Initializing the database..."
     python manage.py initialize_site
     #python manage.py loaddata $JSON_DATA_FIXTURE
