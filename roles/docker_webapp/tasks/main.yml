@@ -112,9 +112,3 @@
     links: postgresql:pg
     volumes: "{{ host_dir_for_codebase }}:{{ container_dir_for_codebase }}"
   sudo: True
-
-- name: Restart Nginx
-  service:
-    name: nginx
-    state: restarted
-  sudo: True
