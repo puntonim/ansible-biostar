@@ -159,11 +159,10 @@ Log files are in: `/srv/biostar-codebase/live/logs/`.
 ### 7.2. Proper Maintenance
 
 - SSH into the webapp Docker container
-- Stop the webapp Runit service, kill waitress-serve, source the env vars, do the mainainance, restart the webapp Runit service:
+- Stop the webapp Runit service, source the env vars, do the mainainance, restart the webapp Runit service:
 
 ```
 sv stop webapp
-killall -9 waitress-serve
 
 cd /srv/biostar
 source conf/production.env
