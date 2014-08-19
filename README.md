@@ -64,7 +64,6 @@ pip install ansible
   - Copy the file [roles/docker_webapp/files/conf/production.env.template](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/conf/production.env.template) to `production.env` in the same folder and edit its `CUSTOM SECTION`.   
 *Note*: `production.env` is ignored by git, so your passwords are safe!
   - Edit the `CUSTOM SECTION` of [roles/docker_webapp/templates/biostar/settings/production.py.j2](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/templates/biostar/settings/production.py.j2)
-  - Add your favicon replacing the file: [roles/docker_webapp/files/biostar/static/favicon.ico](https://github.com/nimiq/ansible-biostar/blob/master/roles/docker_webapp/files/biostar/static/favicon.ico)
 3. Run the Ansible playbook, the basic usage is:
 
 ```
