@@ -5,7 +5,7 @@
 from .base import *
 
 from logging.config import dictConfig
-from .logger_production import LOGGING
+from .logger_production import LOGGING, log_folder
 dictConfig(LOGGING)
 
 # Turn off debug mode on deployed servers.
@@ -112,11 +112,11 @@ ADMIN_LOCATION = "Stockholm, Sweden"
 
 # What domain will handle the replies.
 EMAIL_REPLY_PATTERN = "reply+%s+code@neurostars.org"
-# The format of the email that is sent
+# The format of the email that is sent.
 EMAIL_FROM_PATTERN = u"%s on Neurostars <%s>"
-# The secret key that is required to parse the email
+# The secret key that is required to parse the email.
 EMAIL_REPLY_SECRET_KEY = "abc"
-# The subject of the reply goes here
+# The subject of the reply goes here.
 EMAIL_REPLY_SUBJECT = u"[neurostars] %s"
 
 # The theme dir with logo, css and flatpage files.
@@ -126,6 +126,16 @@ FLATPAGE_IMPORT_DIR = abspath(STATIC_DIR, THEME_DIR, "pages")
 SITE_LOGO = os.path.join(THEME_DIR, "img", "neurostars.logo.png")
 # The default CSS file to load.
 SITE_STYLE_CSS = os.path.join(THEME_DIR, "css", "neurostars.style.less")
+
+# Continuous deployment with GitHub Webhooks.
+GITHUB_WEBHOOK_EVENTS = {
+    'push': True,
+    'release': True,
+}
+GITHUB_WEBHOOK_PUSH_MONITORED_BRANCH = 'develop'
+GITHUB_WEBHOOK_PASSWORD = get_env('GITHUB_WEBHOOK_PASSWORD')
+GITHUB_WEBHOOK_SCRIPT_TO_TRIGGER = abspath(HOME_DIR, 'continuous_deployment.sh')
+GITHUB_WEBHOOK_SCRIPT_LOG_FILE = abspath(log_folder, 'continuous_deployment.log')
 
 ## CUSTOM SECTION END
 ##################################################################################################

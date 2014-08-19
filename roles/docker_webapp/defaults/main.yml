@@ -2,3 +2,4 @@
 git_https_repo: https://github.com/ialbert/biostar-central.git
 git_branch: master
 load_sample_data: False
+nightly_reset_db: False

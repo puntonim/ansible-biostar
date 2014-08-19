@@ -11,10 +11,30 @@ add_update_index_to_crontab () {
     # res = 1 the command is not in the cron tab
     if [ "$res" -eq 1 ]; then
         echo " * Adding the update index command to the crontab..."
+        # Every 10 mins.
         crontab -l | { cat; echo "*/10 * * * * {{ container_dir_for_codebase }}/$command"; } | crontab -
 
     else
         echo " * The update index command is already in the crontab..."
+    fi
+}
+
+add_reset_db_to_crontab () {
+    # Write the reset db task to crontab
+
+    command="reset-db.sh"
+    crontab -l | grep $command
+    res=`echo $?`
+    # If:
+    # res = 0 the command is already in the cron tab
+    # res = 1 the command is not in the cron tab
+    if [ "$res" -eq 1 ]; then
+        echo " * Adding the reset db command to the crontab..."
+        # Every night at 4am.
+        crontab -l | { cat; echo "00 04 * * * {{ container_dir_for_codebase }}/$command"; } | crontab -
+
+    else
+        echo " * The reset db command is already in the crontab..."
     fi
 }
 
@@ -56,6 +76,20 @@ fix_nginx_config_file () {
         sed -ri "0,/^(\s*server_name )(xxxx);$/s//\1$CLEAN;/" /etc/nginx/sites-enabled/biostar
         sed -ri "0,/^(\s*rewrite \^\(\.\*\) http\:\/\/)(www.xxxx)(.?1 permanent);$/s//\1$BIOSTAR_HOSTNAME\3;/" /etc/nginx/sites-enabled/biostar
     fi
+
+    echo " * Restarting nginx..."
+    service nginx restart
+}
+
+chown_webapp_service () {
+    # Give the user `www-data` the permission to control the Runit `webapp` service
+    # So the userw root and www-data could start|stop the `webapp` service with:
+    # `sv start|stop webapp`
+
+    echo "Giving the use www-data the permission to manage the webapp service..."
+    chmod 755 /etc/service/webapp/supervise
+    chown www-data /etc/service/webapp/supervise/ok /etc/service/webapp/supervise/control /etc/service/webapp/supervise/status
+
 }
 
 cd {{ container_dir_for_codebase }}
@@ -70,31 +104,47 @@ source conf/production.env
 create_database
 
 echo " * Migrating the database..."
-python manage.py syncdb -v 1 --noinput
-python manage.py migrate biostar.apps.users
-python manage.py migrate biostar.apps.posts
-python manage.py migrate
+if [ "$newdb" -eq 0 ]; then
+    # A new database has just been created: we have to syncdb and migrate specific apps
+    python manage.py syncdb -v 1 --noinput
+    python manage.py migrate biostar.apps.users --noinput
+    python manage.py migrate biostar.apps.posts --noinput
+fi
+# And run a regular migration (valid for both new and existen dbs)
+python manage.py migrate --noinput
+
+echo " * Initializing the database..."
+# `initialize_site` is a idempotent operation, so it will have no effect on an existent db
+python manage.py initialize_site
 
 if [ "$newdb" -eq 0 ]; then
-    # A new database has just been created and migrated.
-    echo " * Initializing the database..."
-    python manage.py initialize_site
-    {% if load_sample_data and  load_sample_data != 'no' %}
+    # A new database has just been created and migrated: we have to load the fixture and rebuild the index
+    {% if load_sample_data and load_sample_data != 'no' %}
+    echo " * Loading sample data fixture..."
     python manage.py loaddata $JSON_DATA_FIXTURE
     {% endif %}
+    echo " * Building the full text search index..."
     python manage.py rebuild_index --noinput
 else
-    echo " * Skipping initialization of the database..."
+    echo " * Database already existent: skipping fixture import and index rebuild..."
 fi
 
-echo " * Collectstatic..."
+echo " * Collecting static files..."
 python manage.py collectstatic --noinput
 
 # Add the update index command to the crontab
 add_update_index_to_crontab
 
+# Add the script to reset the db every night
+{% if nightly_reset_db and nightly_reset_db != 'no' %}
+add_reset_db_to_crontab
+{% endif %}
+
 # Add the right domain to Nginx site config file
 fix_nginx_config_file
+
+# Give the user `www-data` the permission to control the Runit `webapp` service
+chown_webapp_service
 
 echo " * Running waitress web server on port 8000..."
 chown -R www-data:www-data /srv/biostar

@@ -46,6 +46,15 @@
     src: conf
     dest: "{{ host_dir_for_codebase }}"
 
+- name: Copy the auto deployment script
+  copy:
+    src: continuous_deployment.sh
+    dest: "{{ host_dir_for_codebase }}"
+    owner: www-data
+    group: www-data
+    mode: 0755
+  sudo: True
+
 - name: Copy the settings file
   template:
     src: biostar/settings/production.py.j2
@@ -64,6 +73,15 @@
   template:
     src: run-webapp.sh.j2
     dest: "{{ host_dir_for_codebase }}/run-webapp.sh"
+    owner: www-data
+    group: www-data 
+    mode: 0755
+  sudo: True
+
+- name: Copy reset-db.sh
+  template:
+    src: reset-db.sh.j2
+    dest: "{{ host_dir_for_codebase }}/reset-db.sh"
     owner: www-data
     group: www-data 
     mode: 0755

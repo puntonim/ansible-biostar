@@ -4,4 +4,4 @@ cd /srv/biostar
 source conf/production.env
 source /etc/container_environment.sh
 RES=`exec /sbin/setuser www-data python manage.py update_index`
-exec /sbin/setuser www-data /bin/bash -c "echo `date` - '$RES' >> live/logs/update_index.log"
+exec /sbin/setuser www-data /bin/bash -c "echo `date` - '$RES' >> live/logs/update-index.log"

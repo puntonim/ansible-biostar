@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Run the `flush` management command which returns the database to the
+# state it was in immediately after syncdb was executed.
+# Load the sample data using the default fixture.
+# Finally restart the `webapp` service.
+
+cd /srv/biostar
+source conf/production.env
+source /etc/container_environment.sh
+
+echo `date` - Resetting the db... >> live/logs/reset-db.log
+
+# Flush
+# Note: all exec commands are surrounded by `` otherwise they exit the script
+`exec /sbin/setuser www-data python manage.py flush --noinput >>live/logs/reset-db.log 2>&1`
+
+# Load fixture
+{% if load_sample_data and load_sample_data != 'no' %}
+`exec /sbin/setuser www-data python manage.py loaddata $JSON_DATA_FIXTURE >>live/logs/reset-db.log 2>&1`
+{% endif %}
+
+echo '' >> live/logs/reset-db.log
+
+# Restart webapp
+sv stop webapp
+sv start webapp
