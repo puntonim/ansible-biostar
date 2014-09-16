@@ -93,16 +93,16 @@ except ImproperlyConfigured:
 START_CATEGORIES = [
     "Latest",  "Open",
 ]
-
 # These should be the most frequent (or special) tags on the site.
 NAVBAR_TAGS = [
     "fmri", "eeg", "t1",
 ]
-
 # The last categories. These tags have special meaning internally.
 END_CATEGORIES = [
     #"Tutorials", "Tools",  "Jobs", "Forum",
 ]
+# This will form the navbar
+CATEGORIES = START_CATEGORIES + NAVBAR_TAGS + END_CATEGORIES
 
 # These are the tags that always show up in the tag recommendation dropdown.
 POST_TAG_LIST = NAVBAR_TAGS + ["software error"]
