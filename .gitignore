@@ -58,8 +58,12 @@ docs/_build/
 # Temp files
 *.tmp
 
-# Production file with passwords
+# Production and staging settings file (with passwords)
 production.env
+production.env.live
+production.env.staging
+production.py.j2.live
+production.py.j2.staging
 
 # Certificates
 *.p12
