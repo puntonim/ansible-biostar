@@ -43,8 +43,11 @@ The tasks performed by the playbook are:
 - Create an Amazon Key Pair with the public SSH key of the machine used to run Ansible.
 - Launch an Amazon EC2 instance.
 - Install Docker in the instance.
-- Build and run a Docker container named `postgresql` with PostgreSQL 9.3.
-- Build and run a Docker container named `webapp` with Nginx and [waitress](http://waitress.readthedocs.org/en/latest/) webserver running the provided codebase. 
+- Ship a [PostgreSQL 9.3 server inside a Docker container](https://github.com/nimiq/docker-postgresql93)
+- Ship a [BioStar](https://github.com/ialbert/biostar-central/) based website with
+[Nginx](http://nginx.org/) as reverse proxy server, 
+[Waitress](http://waitress.readthedocs.org/en/latest/) as webserver
+- Available in [Ansible Galaxy](https://galaxy.ansible.com/list#/roles/1057)
 
 ## 3. Requirements
 
