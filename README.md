@@ -35,7 +35,7 @@ ansible-playbook gce.yml --extra-vars 'gce_service_email=<SERVICE_ACCOUNT_EMAIL>
 
 ## 2. Overview
 
-An Ansible playbook to automate the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 or GCE instances using Docker containers.
+An Ansible playbook, available in [Ansible Galaxy](https://galaxy.ansible.com/list#/roles/1057), to automate the deployment of a [Biostar-based](https://github.com/ialbert/biostar-central) project to an Amazon EC2 or GCE instances using Docker containers.
 
 The tasks performed by the playbook are:
 
@@ -47,7 +47,6 @@ The tasks performed by the playbook are:
 - Ship a [BioStar](https://github.com/ialbert/biostar-central/) based website with
 [Nginx](http://nginx.org/) as reverse proxy server, 
 [Waitress](http://waitress.readthedocs.org/en/latest/) as webserver
-- Available in [Ansible Galaxy](https://galaxy.ansible.com/list#/roles/1057)
 
 ## 3. Requirements
 
